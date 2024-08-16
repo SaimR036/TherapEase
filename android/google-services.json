@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "744230371015",
+    "project_id": "therapease-c2a4c",
+    "storage_bucket": "therapease-c2a4c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:744230371015:android:b7de1885581536e173c8e2",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbnWS_GfE3pBP5irnAdJvPc-foyKU8C10"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
