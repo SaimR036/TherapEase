@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/providers/enlarger_provider.dart';
+import 'package:provider/provider.dart';
 
 // Define the reusable Container component
 class TextContainer extends StatefulWidget {
@@ -44,6 +46,8 @@ class _TextContainerState extends State<TextContainer> {
   late double width;
   late bool _enlarged;
   late var doctor;
+  late List search_list;
+  late List allDoctors;
 var enlarge= false;
 
 void initState() {
@@ -53,6 +57,8 @@ void initState() {
 
   @override
   Widget build(BuildContext context) {
+    print('Hello');
+    var IndProvider = Provider.of<EnlargerProvider>(context);
     show = widget.show;
     ind = widget.ind;
     index = widget.index;
@@ -64,6 +70,9 @@ void initState() {
     width = widget.width;
     _enlarged = widget.enlarged;
     doctor = widget.doctor;
+    search_list = IndProvider.search_list;
+    allDoctors = IndProvider.allDoctors;
+    print(search_list);
     return Align(
                   alignment:  Alignment.topCenter,
                   child: AnimatedContainer(
@@ -172,20 +181,46 @@ void initState() {
                                 
                                 child: Text(doctor['Ban']==0? 'Ban': 'Unban',style: TextStyle(fontFamily: 'Font',color: Colors.white),),
                                 onPressed: ()
-                                {
+                                async{
                                   if (doctor['Ban']==0)
                                   {
-                                  FirebaseFirestore.instance
+
+                                  await FirebaseFirestore.instance
         .collection('Doctors') // Replace with your collection name
         .doc(doctor['Email'])
         .update({'Ban': 1});
-                                  }
+                ;print(search_list);
+        if (search_list.length>0)
+        {
+        print('Selected');
+        print(IndProvider.allDoctors[search_list[index]]);
+        IndProvider.toggleBanAllDoctors(search_list[index],1);
+
+        }
+        else{
+        IndProvider.toggleBanAllDoctors(index,1);
+                             }                     }
                                   else{
-                                    FirebaseFirestore.instance
+                                    await FirebaseFirestore.instance
         .collection('Doctors') // Replace with your collection name
         .doc(doctor['Email'])
         .update({'Ban': 0});
+        print('Ban is: ');
+                        ;print(search_list);
+
+        if (search_list.length>0)
+        {
+          print('Selected');
+        print(IndProvider.allDoctors[search_list[index]]);
+        IndProvider.toggleBanAllDoctors(search_list[index],0);
+
+        }
+        else{
+        IndProvider.toggleBanAllDoctors(index,0);
+                             } 
+
                                   }
+                                 
                                 },
                                 ),),
                     if (show==true && ind ==index)

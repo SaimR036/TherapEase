@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/Info_container.dart';
-import 'package:image_picker/image_picker.dart';
+// import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:fuzzy/fuzzy.dart';
@@ -16,6 +16,7 @@ class Admin extends StatefulWidget {
 }
 
 class _AdminState extends State<Admin> with SingleTickerProviderStateMixin {
+
   late TabController _tabController;
 
   @override
@@ -32,7 +33,8 @@ class _AdminState extends State<Admin> with SingleTickerProviderStateMixin {
   File? _image;
   var show_adder=false;
   Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    //final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    var pickedFile;
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
@@ -56,29 +58,38 @@ var show=false;
 var closest;
 var enlarged_adder=false;
 var _isLoading = false;
+var search_list = [];
 void searchName(String name) async {
-
+ search_list=[];
+  if (name != '')
+  {
   var closest;
-      final fuse = Fuzzy(allDoctors.map((doc) => doc['Name']).toList());
+      final fuse = Fuzzy(IndProvider.allDoctors.map((doc) => doc['Name']).toList());
   final results = fuse.search(name);
-
     if (results.isNotEmpty) {
     // Take up to 3 results, or all if there are less than 3
     final filteredResults = results.take(3).toList();
+    for (var val in filteredResults)
+    {
 
+      search_list.add(val.matches[0].arrayIndex);
+    }
+    }
     // Map the filtered results back to the original DocumentSnapshot objects
-    final closestDoctors = filteredResults.map((result) => allDoctors[result.item.index]).toList();
-    IndProvider.toggleClosest(closestDoctors);
-  
+ 
   }
 
-    
+    IndProvider.setSearchList(search_list);
+    print('All: ');
+    print(IndProvider.allDoctors);
+    print('SearchList: ');
+    print(search_list);
   }
-List<DocumentSnapshot> allDoctors = [];
+  var allDoctors;
 var search_one=false;
   @override
   Widget build(BuildContext context) {
-
+    
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
@@ -92,7 +103,6 @@ var search_one=false;
   _enlarged == true? curr_height = enlarged_height: curr_height = normal_height;
   _enlarged == true? curr_width = enlarged_width: curr_width = normal_width;
     IndProvider = Provider.of<EnlargerProvider>(context);
-
     return Scaffold(
       appBar: AppBar(
         
@@ -165,7 +175,7 @@ var search_one=false;
                 setState(() {
                   
                 search_one = false;                });
-
+                print(search_one);
               },
               icon: Icon(Icons.refresh_outlined),
               )
@@ -198,11 +208,11 @@ var search_one=false;
                Container(
                 
                 margin: EdgeInsets.fromLTRB(0,height*0.15,0,0),
-                child:  allDoctors.length!=0?
+                child:  IndProvider.allDoctors.length!=0?
                 ListView.builder(
-                      itemCount: search_one==true? IndProvider.closest.length: allDoctors.length,
+                      itemCount: search_one==true? IndProvider.search_list.length: /*type=='All'?*/  IndProvider.allDoctors.length/*: IndProvider.allDoctors.where((doctor) => doctor['Profession'].toLowerCase() == type.toLowerCase()).toList().length*/,
                       itemBuilder: (context, index) {
-                        var doctor = search_one==true? IndProvider.closest[index] : allDoctors[index];
+                        var doctor = search_one==true? IndProvider.allDoctors[IndProvider.search_list[index]] :/*type=='All'?*/  IndProvider.allDoctors[index] ;/*: IndProvider.allDoctors.where((doctor) => doctor['Profession'].toLowerCase() == type.toLowerCase()).toList()[index];*/
                         return GestureDetector(
                     onTap: ()
                     {
@@ -232,7 +242,7 @@ var search_one=false;
                       });
                       }
                     },
-                    child: TextContainer(height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: IndProvider.ind,index:index, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width)
+                    child:TextContainer(height: height,  width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: IndProvider.ind,index:index, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width)
                     // child: search_one==true? search_enlarged==true? TextContainer(height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: 1,index:1, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width, ):  TextContainer(height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: 0,index:1, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width, ) : TextContainer(height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: ind,index:index, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width, ) 
                      ); },
                     ):
@@ -245,15 +255,21 @@ var search_one=false;
                   StreamBuilder(
                   stream: FirebaseFirestore.instance.collection('Doctors').snapshots(),
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+
                     if (!snapshot.hasData) {
                       return Container(
                         margin: EdgeInsets.fromLTRB(0,height*0.1,0,0),
                         child: CircularProgressIndicator());
                     }
+                    Future.delayed(Duration.zero,(){
+                      IndProvider.toggleAllDoctors(allDoctors);
+
+                    });
                     return ListView.builder(
                       itemCount: snapshot.data!.docs.length,
                       itemBuilder: (context, index) {
                         allDoctors = snapshot.data!.docs;
+
                         var doctor = snapshot.data!.docs[index];
                         return GestureDetector(
                     onTap: ()
@@ -285,7 +301,7 @@ var search_one=false;
                       });
                       }
                     },
-                    child: TextContainer(height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: IndProvider.ind,index:index, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width)
+                    child:TextContainer(height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: IndProvider.ind,index:index, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width)
                     // child: search_one==true? search_enlarged==true? TextContainer(height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: 1,index:1, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width, ):  TextContainer(height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: 0,index:1, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width, ) : TextContainer(height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: ind,index:index, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width, ) 
                      ); },
                     );
@@ -486,5 +502,7 @@ print(enlarged_adder);
         ],
       ),
     );
+    
   }
+  
 }
