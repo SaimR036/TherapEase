@@ -31,10 +31,30 @@ class _InstructionsState extends State<Instructions> {
           Align(
             alignment: Alignment.topCenter,
             child: Container(
-              margin: EdgeInsets.fromLTRB(width*0.2,height*0.10,width*0.2,0),
-              child: Text('You have the option to run a psychological test for yourself. This test will give us a better understanding of your psychological needs.\n\nWould you like to take this test now?',
-              style: TextStyle(fontFamily: 'Font',color: Colors.white,fontSize:26 ),
-              ),),
+              margin: EdgeInsets.fromLTRB(width*0.1,height*0.10,width*0.07,0),
+              child: Text.rich( // Use Text.rich to style parts of the text differently
+      TextSpan(
+        children: [
+          TextSpan(
+            text: 'You have the option to run a psychological test for yourself. This test will give you a better understanding of your psychological needs. Please select the most appropriate answer that applied to you ',
+            style: TextStyle(fontFamily: 'Font', color: Colors.white, fontSize: 22),
+          ),
+          TextSpan(
+            text: 'over the past week',
+            style: TextStyle(
+              fontFamily: 'Font',
+              color: Colors.black, // Set text color to black
+              fontSize: 22,
+              fontWeight: FontWeight.bold, // Make the text bold
+            ),
+          ),
+          TextSpan(
+            text: '. There are no right or wrong answers. Do not spend too much time on any statement.\n\nWould you like to take this test now? ',
+            style: TextStyle(fontFamily: 'Font', color: Colors.white, fontSize: 22),
+          ),
+        ],
+      ),
+    ),),
           ),
           Align(
             alignment: Alignment.topCenter,
@@ -42,7 +62,7 @@ class _InstructionsState extends State<Instructions> {
           Container(
             width: width*0.6,
             height: height*0.05,
-            margin: EdgeInsets.fromLTRB(width*0.2, height*0.65,width*0.2,0),
+            margin: EdgeInsets.fromLTRB(width*0.2, height*0.7,width*0.2,0),
             decoration: BoxDecoration(color: Color(0xFF0B6E6F),
             borderRadius: BorderRadius.circular(10)
             ),
@@ -55,7 +75,7 @@ class _InstructionsState extends State<Instructions> {
             Container(
             width: width*0.6,
             height: height*0.05,
-            margin: EdgeInsets.fromLTRB(width*0.2, height*0.75,width*0.2,0),
+            margin: EdgeInsets.fromLTRB(width*0.2, height*0.79,width*0.2,0),
             decoration: BoxDecoration(color: Color(0xFF0B6E6F),
             borderRadius: BorderRadius.circular(10)
             ),

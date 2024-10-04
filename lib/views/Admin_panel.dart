@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/Info_container.dart';
+import 'package:flutter_application_1/components/parent_info.dart';
+import 'package:flutter_application_1/providers/parent_info_container.dart';
 // import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
@@ -9,20 +11,24 @@ import 'package:fuzzy/fuzzy.dart';
 import '../providers/enlarger_provider.dart';
 
 class Admin extends StatefulWidget {
-  const Admin({super.key});
+final int index; 
 
+  const Admin({super.key, this.index = 1});
   @override
   State<Admin> createState() => _AdminState();
 }
 
 class _AdminState extends State<Admin> with SingleTickerProviderStateMixin {
+  var  index = 1; 
 
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+
     _tabController = TabController(length: 2, vsync: this);
+  
   }
 
   @override
@@ -30,8 +36,18 @@ class _AdminState extends State<Admin> with SingleTickerProviderStateMixin {
     _tabController.dispose();
     super.dispose();
   }
-  File? _image;
-  var show_adder=false;
+
+
+  TextEditingController name = TextEditingController();
+  TextEditingController email = TextEditingController();
+  TextEditingController cnic = TextEditingController();
+  TextEditingController phone = TextEditingController();
+
+
+var height;
+var width;
+
+File? _image;
   Future<void> _pickImage() async {
     //final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     var pickedFile;
@@ -41,70 +57,28 @@ class _AdminState extends State<Admin> with SingleTickerProviderStateMixin {
       });
     }
   }
-   var curr_height;
-  var curr_width;
-  TextEditingController name = TextEditingController();
-  TextEditingController email = TextEditingController();
-  TextEditingController cnic = TextEditingController();
-  TextEditingController phone = TextEditingController();
-  var _enlarged_width_1;
+    var _enlarged_width_1;
   var _enlarged_height_1;
-  var IndProvider;
-var _enlarged=false;
-var search_enlarged=false;
-var ind=-1;
-var a =0;
-var show=false;
-var closest;
-var enlarged_adder=false;
-var _isLoading = false;
-var search_list = [];
-void searchName(String name) async {
- search_list=[];
-  if (name != '')
-  {
-  var closest;
-      final fuse = Fuzzy(IndProvider.allDoctors.map((doc) => doc['Name']).toList());
-  final results = fuse.search(name);
-    if (results.isNotEmpty) {
-    // Take up to 3 results, or all if there are less than 3
-    final filteredResults = results.take(3).toList();
-    for (var val in filteredResults)
-    {
+  
 
-      search_list.add(val.matches[0].arrayIndex);
-    }
-    }
-    // Map the filtered results back to the original DocumentSnapshot objects
+
+
+
+
+
+
  
-  }
-
-    IndProvider.setSearchList(search_list);
-    print('All: ');
-    print(IndProvider.allDoctors);
-    print('SearchList: ');
-    print(search_list);
-  }
-  var allDoctors;
-var search_one=false;
   @override
   Widget build(BuildContext context) {
-    
+    index = widget.index;
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-
       _enlarged_width_1 = width * 0.5;
       _enlarged_height_1 = height*0.3;
-    var enlarged_height = height * 0.4;
-  var normal_height = height * 0.07;
-  
-  var enlarged_width = width *0.8;
-  var normal_width = width * 0.8;
-  _enlarged == true? curr_height = enlarged_height: curr_height = normal_height;
-  _enlarged == true? curr_width = enlarged_width: curr_width = normal_width;
-    IndProvider = Provider.of<EnlargerProvider>(context);
+    var provider = Provider.of<ParentInfoContainer>(context);
     return Scaffold(
-      appBar: AppBar(
+      
+      appBar: index==1? AppBar(
         
         backgroundColor: Color(0xFF05696A),
         title: Center(child: Text('Admin Panel', style: TextStyle(fontFamily: 'Font', fontSize: 30, color: Colors.white))),
@@ -115,205 +89,13 @@ var search_one=false;
             Tab(child: Text('Add Dr.',style: TextStyle(fontFamily: 'Font',fontSize: 20),)),
           ],
         ),
-      ),
-      body: TabBarView(
+      ):null,
+      body:TabBarView(
         controller: _tabController,
         children: [
-          Stack(
-              children: [
-              Container(
-            decoration: BoxDecoration(
-            gradient: LinearGradient(
-            begin: Alignment.topCenter, // Gradient starting point
-            end: Alignment.bottomCenter, // Gradient ending point
-            colors: [
-            Color(0xFF05696A), // First hex color (Blue)
-            Color(0xFF29BDBD), // Second hex color (Red)
-            ],
-            ),
-            ),
-            ),
-            Container(
-              decoration: BoxDecoration(color: Colors.white,
-              borderRadius: BorderRadius.circular(10)
-              ),
-              width: width*0.55,
-              height: height*0.05,
-              margin:EdgeInsets.fromLTRB(width*0.07,height*0.1,0,0),
-              padding: EdgeInsets.fromLTRB(width*0.01,0,height*0.005,width*0.01),
-              child:TextField(
-                
-              decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: 'Search',
-              hintStyle: TextStyle(color: Colors.black)
-              
-              
-              ),onSubmitted: (value) {
-                setState(() {
-                  _isLoading = true;
-                });
-                searchName(value);
-                setState(() {
-                 _isLoading = false;
-
-                  search_one = true;
-                });
-              },)
-
-
-            ),
-
-            Container(
-              decoration: BoxDecoration(color: Color(0xFF29BDBD),
-              borderRadius: BorderRadius.circular(10)
-              ),
-              width: width*0.08,
-              height: height*0.05,
-              margin:EdgeInsets.fromLTRB(width*0.65,height*0.1,0,0),
-              child:IconButton(onPressed:(){
-                setState(() {
-                  
-                search_one = false;                });
-                print(search_one);
-              },
-              icon: Icon(Icons.refresh_outlined),
-              )
-
-
-            ),
-            Container(
-              decoration: BoxDecoration(color: Color(0xFF29BDBD),
-              borderRadius: BorderRadius.circular(10)
-              ),
-              width: width*0.15,
-              height: height*0.05,
-              margin:EdgeInsets.fromLTRB(width*0.75,height*0.1,0,0),
-              child:TextButton(onPressed:(){},
-              child:Text('Type',style: TextStyle(
-                fontSize: 20,
-                fontFamily: 'Font',color: Colors.white),)
-              )
-
-
-            ),
-            Align(
-              alignment: Alignment.topCenter,
-              child: _isLoading==true? 
-              Container(
-                
-                margin: EdgeInsets.fromLTRB(0,height*0.4,0,0),
-                child:  CircularProgressIndicator()):
-              
-               Container(
-                
-                margin: EdgeInsets.fromLTRB(0,height*0.15,0,0),
-                child:  IndProvider.allDoctors.length!=0?
-                ListView.builder(
-                      itemCount: search_one==true? IndProvider.search_list.length: /*type=='All'?*/  IndProvider.allDoctors.length/*: IndProvider.allDoctors.where((doctor) => doctor['Profession'].toLowerCase() == type.toLowerCase()).toList().length*/,
-                      itemBuilder: (context, index) {
-                        var doctor = search_one==true? IndProvider.allDoctors[IndProvider.search_list[index]] :/*type=='All'?*/  IndProvider.allDoctors[index] ;/*: IndProvider.allDoctors.where((doctor) => doctor['Profession'].toLowerCase() == type.toLowerCase()).toList()[index];*/
-                        return GestureDetector(
-                    onTap: ()
-                    {
-                      if(IndProvider.ind==index)
-                      {
-                        setState(() {
-                        IndProvider.toggleInd(-1);
-                         
-                        _enlarged=false;
-                      });
-                       Future.delayed(Duration(milliseconds: 700),(){
-            setState(() {
-              show=false;
-            });});
-                      }
-                      else{
-                      setState(() {
-                        IndProvider.toggleInd(index);
-                        _enlarged=true;
-                      });
-                      print(ind);print(index);
-                      Future.delayed(Duration(milliseconds: 200),(){
-            setState(() {
-              show=true;
-            });
-            
-                      });
-                      }
-                    },
-                    child:TextContainer(height: height,  width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: IndProvider.ind,index:index, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width)
-                    // child: search_one==true? search_enlarged==true? TextContainer(height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: 1,index:1, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width, ):  TextContainer(height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: 0,index:1, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width, ) : TextContainer(height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: ind,index:index, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width, ) 
-                     ); },
-                    ):
-                
-                
-                
-                
-                
-                
-                  StreamBuilder(
-                  stream: FirebaseFirestore.instance.collection('Doctors').snapshots(),
-                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-
-                    if (!snapshot.hasData) {
-                      return Container(
-                        margin: EdgeInsets.fromLTRB(0,height*0.1,0,0),
-                        child: CircularProgressIndicator());
-                    }
-                    Future.delayed(Duration.zero,(){
-                      IndProvider.toggleAllDoctors(allDoctors);
-
-                    });
-                    return ListView.builder(
-                      itemCount: snapshot.data!.docs.length,
-                      itemBuilder: (context, index) {
-                        allDoctors = snapshot.data!.docs;
-
-                        var doctor = snapshot.data!.docs[index];
-                        return GestureDetector(
-                    onTap: ()
-                    {
-                      
-                      if(IndProvider.ind==index)
-                      {
-                        setState(() {
-                        IndProvider.toggleInd(-1);
-                         
-                        _enlarged=false;
-                      });
-                       Future.delayed(Duration(milliseconds: 700),(){
-            setState(() {
-              show=false;
-            });});
-                      }
-                      else{
-                      setState(() {
-                        IndProvider.toggleInd(index);
-                        _enlarged=true;
-                      });
-                      print(ind);print(index);
-                      Future.delayed(Duration(milliseconds: 200),(){
-            setState(() {
-              show=true;
-            });
-            
-                      });
-                      }
-                    },
-                    child:TextContainer(height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: IndProvider.ind,index:index, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width)
-                    // child: search_one==true? search_enlarged==true? TextContainer(height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: 1,index:1, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width, ):  TextContainer(height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: 0,index:1, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width, ) : TextContainer(height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: show, ind: ind,index:index, enlarged: _enlarged, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width, ) 
-                     ); },
-                    );
-                  },
-                )
-              ),
-            )
-
-
-
-,
-        Align(
+          Stack(children: [
+          ParentInfo(isUser: false,),
+           Align(
               alignment: Alignment.bottomCenter,
               child: Container(
               width: width,
@@ -327,12 +109,12 @@ var search_one=false;
               child: AnimatedContainer(
                 duration: Duration(milliseconds: 300),
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: Color(0xFF05696A),),
-              height: enlarged_adder==true? height*0.3: height*0.01,
-              width: enlarged_adder==true? width*0.7: width*0.05,
+              height: provider.enlarged_adder==true? height*0.3: height*0.01,
+              width: provider.enlarged_adder==true? width*0.7: width*0.05,
 
-              margin: enlarged_adder==true? EdgeInsets.fromLTRB(0,0,0,height*0.2): EdgeInsets.fromLTRB(0,0,0,height*0.05),
+              margin: provider.enlarged_adder==true? EdgeInsets.fromLTRB(0,0,0,height*0.2): EdgeInsets.fromLTRB(0,0,0,height*0.05),
               child: 
-              show_adder==true?
+              provider.show_adder==true?
               Stack(children: [ 
                 Align(
                   alignment: Alignment.topCenter,
@@ -445,62 +227,58 @@ SnackBar(
               margin: EdgeInsets.fromLTRB(0,0,0,height*0.01),
               child: IconButton(
                 
-                icon: enlarged_adder==true? Icon(Icons.minimize): Icon(Icons.add), onPressed: (){
-              print(enlarged_adder);
-              if(enlarged_adder==true)
+                icon: provider.enlarged_adder==true? Icon(Icons.minimize): Icon(Icons.add), onPressed: (){
+              if(provider.enlarged_adder==true)
               {
-                print('Hello');
                 setState(() {
-                  enlarged_adder=false;
+                  provider.enlarged_adder=false;
                 });
                 Future.delayed(Duration(milliseconds: 100),(){
 setState(() {
-  show_adder=false;
+  provider.show_adder=false;
 });
 
                 });
               }
-              else if(enlarged_adder==false)
+              else if(provider.enlarged_adder==false)
               {
-              print(enlarged_adder);
               setState(() {
-                print('yay');
-                enlarged_adder=true;
-                print(enlarged_adder);
+                provider.enlarged_adder=true;
                });
               Future.delayed(Duration(milliseconds: 250),(){
 setState(() {
-  show_adder=true;
+  provider.show_adder=true;
 });
 
                 });
-print(enlarged_adder);
                
   }}, iconSize: 50,),
             ))
-              ],
+              ])
 
-          ),
-          Stack(
-              children: [
-              Container(
-            decoration: BoxDecoration(
-            gradient: LinearGradient(
-            begin: Alignment.topCenter, // Gradient starting point
-            end: Alignment.bottomCenter, // Gradient ending point
-            colors: [
-            Color(0xFF05696A), // First hex color (Blue)
-            Color(0xFF29BDBD), // Second hex color (Red)
-            ],
-            ),
-            ),
-            ),
+      ,
+          Text('')
+          // Stack(
+          //     children: [
+          //     Container(
+          //   decoration: BoxDecoration(
+          //   gradient: LinearGradient(
+          //   begin: Alignment.topCenter, // Gradient starting point
+          //   end: Alignment.bottomCenter, // Gradient ending point
+          //   colors: [
+          //   Color(0xFF05696A), // First hex color (Blue)
+          //   Color(0xFF29BDBD), // Second hex color (Red)
+          //   ],
+          //   ),
+          //   ),
+          //   ),
 
-              ],
+          //     ],
 
-          ),
+          // ),
         ],
-      ),
+      )
+      //_buildStackContent()
     );
     
   }

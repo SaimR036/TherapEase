@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_application_1/providers/Indexes_st.dart';
 import 'package:flutter_application_1/providers/enlarger_provider.dart';
+import 'package:flutter_application_1/providers/parent_info_container.dart';
 import 'package:flutter_application_1/set_meet.dart';
 import 'package:flutter_application_1/views/Admin_panel.dart';
 import 'package:flutter_application_1/views/Instructions.dart';
 import 'package:flutter_application_1/views/Language.dart';
 import 'package:flutter_application_1/views/Login.dart';
 import 'package:flutter_application_1/views/Therapists.dart';
+import 'package:flutter_application_1/views/home.dart';
+import 'package:flutter_application_1/views/questionnaire.dart';
 import 'dart:async';
 import 'package:page_transition/page_transition.dart'; 
 import 'firebase_options.dart';  
@@ -26,7 +30,8 @@ Future<void> main() async {
         
         ),
         ChangeNotifierProvider(create: (_) => LoginProvider()),
-
+        ChangeNotifierProvider(create: (_) => Indexes()),
+        ChangeNotifierProvider(create: (_) => ParentInfoContainer()),
         // ... other providers
       ],
     child:const MaterialApp(
@@ -62,7 +67,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
         context,
         PageTransition(
       type: PageTransitionType.rightToLeft, // Or any other type
-      child: const Admin(),
+      child: const Home(),
     ),
       );
     });
