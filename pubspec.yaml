@@ -30,6 +30,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   cloud_firestore: ^4.14.0
+  curved_navigation_bar: ^1.0.3
   cupertino_icons: ^1.0.5
   dart_levenshtein: ^1.0.1
   firebase_auth: ^4.16.0
@@ -83,6 +84,11 @@ flutter:
     - lib\assets\Deep_breath.png
     - lib\assets\meditate.png
     - lib\assets\Brain.png
+    - lib/assets/home.png
+    - lib\assets\appointments.png
+    - lib/assets/book.png
+    - lib/assets/exercises.png
+    - lib/assets/settings.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

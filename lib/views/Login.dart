@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/providers/login_provider.dart';
 import 'package:flutter_application_1/views/Language.dart';
 import 'package:flutter_application_1/views/demographics.dart';
+import 'package:flutter_application_1/views/home.dart';
 import 'dart:async';
 import 'package:page_transition/page_transition.dart'; 
 import 'package:provider/provider.dart';
@@ -140,10 +141,8 @@ Container(
         email: email,
         password: password,
       );
-
       // 2. Handle Successful Login
-      print('Login Successful');
-
+      context.read<LoginProvider>().toggleUid(userCredential.user?.uid);      LoginProvider().toggleUid(userCredential.user?.uid);
       // Optional: Display a success message or navigate to another screen
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -159,7 +158,7 @@ Container(
         context,
         PageTransition(
       type: PageTransitionType.rightToLeft, // Or any other type
-      child: const Demographics(),
+      child: const Home(),
     ),
       );
     } on FirebaseAuthException catch (e) {
@@ -203,7 +202,8 @@ Container(
 
           );
 
-          await FirebaseFirestore.instance.collection('users').doc(email).set({
+          await FirebaseFirestore.instance.collection('users').doc(userCredential.user?.uid).set({
+            'uid': userCredential.user?.uid,
             'name': name,
 
           });

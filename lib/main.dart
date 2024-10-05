@@ -67,7 +67,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
         context,
         PageTransition(
       type: PageTransitionType.rightToLeft, // Or any other type
-      child: const Home(),
+      child: const MeetLink(),
     ),
       );
     });
