@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/question.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/Indexes_st.dart';
+import '../../providers/Indexes_st.dart';
 
 class Questionnaire extends StatefulWidget {
   const Questionnaire({super.key});

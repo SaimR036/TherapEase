@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/providers/login_provider.dart';
-import 'package:flutter_application_1/views/Language.dart';
-import 'package:flutter_application_1/views/demographics.dart';
-import 'package:flutter_application_1/views/home.dart';
+import 'package:flutter_application_1/views/users/Language.dart';
+import 'package:flutter_application_1/views/users/demographics.dart';
+import 'package:flutter_application_1/views/users/home.dart';
 import 'dart:async';
 import 'package:page_transition/page_transition.dart'; 
 import 'package:provider/provider.dart';

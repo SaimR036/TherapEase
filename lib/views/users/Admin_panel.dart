@@ -8,7 +8,7 @@ import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:fuzzy/fuzzy.dart';
 
-import '../providers/enlarger_provider.dart';
+import 'package:flutter_application_1/providers/enlarger_provider.dart';
 
 class Admin extends StatefulWidget {
 final int index; 

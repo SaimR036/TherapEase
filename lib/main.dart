@@ -1,16 +1,20 @@
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_application_1/providers/Indexes_st.dart';
 import 'package:flutter_application_1/providers/enlarger_provider.dart';
 import 'package:flutter_application_1/providers/parent_info_container.dart';
-import 'package:flutter_application_1/set_meet.dart';
-import 'package:flutter_application_1/views/Admin_panel.dart';
-import 'package:flutter_application_1/views/Instructions.dart';
-import 'package:flutter_application_1/views/Language.dart';
-import 'package:flutter_application_1/views/Login.dart';
-import 'package:flutter_application_1/views/Therapists.dart';
-import 'package:flutter_application_1/views/home.dart';
-import 'package:flutter_application_1/views/questionnaire.dart';
+import 'package:flutter_application_1/views/doctors/Appointments.dart';
+import 'package:flutter_application_1/views/doctors/Slots.dart';
+import 'package:flutter_application_1/views/doctors/Therapists_Home.dart';
+import 'package:flutter_application_1/views/users/set_meet.dart';
+import 'package:flutter_application_1/views/users/Admin_panel.dart';
+import 'package:flutter_application_1/views/users/Instructions.dart';
+import 'package:flutter_application_1/views/users/Language.dart';
+import 'package:flutter_application_1/views/users/Login.dart';
+import 'package:flutter_application_1/views/users/Therapists.dart';
+import 'package:flutter_application_1/views/users/home.dart';
+import 'package:flutter_application_1/views/users/questionnaire.dart';
 import 'dart:async';
 import 'package:page_transition/page_transition.dart'; 
 import 'firebase_options.dart';  
@@ -67,7 +71,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
         context,
         PageTransition(
       type: PageTransitionType.rightToLeft, // Or any other type
-      child: const MeetLink(),
+      child: const DrSlots(),
     ),
       );
     });
@@ -86,8 +90,33 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-
+    var _selectedIndex=0;
     return Scaffold(
+      bottomNavigationBar: CurvedNavigationBar(
+        backgroundColor: Color(0xFF29BDBD),
+        height: height*0.07,
+        buttonBackgroundColor: Color(0xFF05696A),
+        color: Color(0xFF05696A),
+        animationDuration: const Duration(milliseconds: 300),
+        items: <Widget>[
+          Column(children: [Image.asset('lib/assets/reviews.png', height: 25),Text('Reviews',style: TextStyle(fontSize: 10),),
+          ],),
+          Column(children: [Image.asset('lib/assets/appointments.png', height: 25),Text('Appointments',style: TextStyle(fontSize: 10)),
+          ],),
+          Column(children: [Image.asset('lib/assets/home.png', height: 24),Text('Home',style: TextStyle(fontSize: 10)),
+          ],),
+          Column(children: [Image.asset('lib/assets/slots.png', height: 25),Text('Slots',style: TextStyle(fontSize: 10)),
+          ],),
+          Column(children: [Image.asset('lib/assets/settings.png', height: 25),Text('Settings',style: TextStyle(fontSize: 10)),
+          ],),
+         
+        ],
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+      ),
       body: Stack(
         children: [
           Container(

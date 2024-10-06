@@ -23,7 +23,7 @@ class _HomeState extends State<Home> {
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
       bottomNavigationBar: CurvedNavigationBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Color(0xFF29BDBD),
         height: height*0.07,
         buttonBackgroundColor: Color(0xFF05696A),
         color: Color(0xFF05696A),

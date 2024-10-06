@@ -89,6 +89,8 @@ flutter:
     - lib/assets/book.png
     - lib/assets/exercises.png
     - lib/assets/settings.png
+    - lib/assets/reviews.png
+    - lib/assets/slots.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
