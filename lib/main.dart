@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_application_1/providers/Indexes_st.dart';
 import 'package:flutter_application_1/providers/enlarger_provider.dart';
 import 'package:flutter_application_1/providers/parent_info_container.dart';
+import 'package:flutter_application_1/views/admin/Applications.dart';
 import 'package:flutter_application_1/views/doctors/Appointments.dart';
 import 'package:flutter_application_1/views/doctors/Slots.dart';
 import 'package:flutter_application_1/views/doctors/Therapists_Home.dart';
@@ -15,6 +16,7 @@ import 'package:flutter_application_1/views/users/Login.dart';
 import 'package:flutter_application_1/views/users/Therapists.dart';
 import 'package:flutter_application_1/views/users/home.dart';
 import 'package:flutter_application_1/views/users/questionnaire.dart';
+import 'package:flutter_application_1/views/users/test1.dart';
 import 'dart:async';
 import 'package:page_transition/page_transition.dart'; 
 import 'firebase_options.dart';  
@@ -71,7 +73,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
         context,
         PageTransition(
       type: PageTransitionType.rightToLeft, // Or any other type
-      child: const DrSlots(),
+      child:  Therapists_Home(),
     ),
       );
     });

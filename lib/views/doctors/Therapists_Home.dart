@@ -85,7 +85,7 @@ class _Therapists_HomeState extends State<Therapists_Home> {
                         child: CircularProgressIndicator(color: Colors.white,));
                     }
                     var details = snapshot.data!.data() as Map<String, dynamic>;
-                    List<dynamic> reviews = details['Reviews'];
+                    var reviews = details['Reviews'];
                     return Container(
                       margin: EdgeInsets.fromLTRB(width*0.025, height*0.01,0,0),
                        width: width*0.85,
@@ -118,6 +118,7 @@ class _Therapists_HomeState extends State<Therapists_Home> {
                               ],),
                               SizedBox(height: height*0.003,),
                               Container(
+                                alignment: Alignment.topLeft,
                                 // height: height*0.1,
                                 // width: width*0.1,
                                 child: Text(review['Review'],maxLines: 3,overflow: TextOverflow.ellipsis,style: TextStyle(color: Colors.white),),)
@@ -153,13 +154,14 @@ class _Therapists_HomeState extends State<Therapists_Home> {
                             child: CircularProgressIndicator(color: Colors.white,));
                         }
                         var details = snapshot.data!.data() as Map<String, dynamic>;
-                        List<dynamic> appointments = details['Appointments'];
+                        var appointments = details['Appointments'];
                         return Container(
                           child: ListView.builder(
                             itemCount: appointments.length,
                             itemBuilder: (context, index) {
                               var appointment  = appointments[index];
                               return Container(
+                                margin: EdgeInsets.only(bottom: height*0.03),
                                 decoration: BoxDecoration(
                   
                                   color: Color(0xFF05696A),
@@ -174,34 +176,41 @@ class _Therapists_HomeState extends State<Therapists_Home> {
                                 Row(
                                   children: [
                                 Container(
+                                  alignment: Alignment.topLeft,
                                 margin: EdgeInsets.only(left: width*0.02),
                                 width: width*0.4,
                                 height: height*0.05,
-                                child: Text(appointment['Pname'],style: TextStyle(color: Colors.white,fontSize: 20),)),
-                                SizedBox(width: width*0.2,),
+                                child: FittedBox(child: Text(appointment['Pname'],style: TextStyle(color: Colors.white,fontSize: 20),))),
+                                SizedBox(width: width*0.1,),
                                 Container(
                                   alignment: Alignment.topRight,
                                 margin: EdgeInsets.fromLTRB(0,0,0,0),
-                                width: width*0.25,
-                                child: Text(appointment['Date'],style: TextStyle(color: Colors.white,fontSize: 20),)),
+                                width: width*0.35,
+                                height: height*0.05,
+                                child: FittedBox(child: Text(appointment['Date'],style: TextStyle(color: Colors.white,fontSize: 20),))),
                                   ]), 
                                 Row(children: [
-                                Container(
+                                Container(alignment: Alignment.topLeft,
                                 margin: EdgeInsets.fromLTRB(width*0.02,0,0,0),
                                 width: width*0.3,
-                                child: Text(appointment['Note'],maxLines: 1,overflow: TextOverflow.ellipsis,style: TextStyle(color: Colors.white,fontSize: 15),)),
+                                height: height*0.05,
+                                child: FittedBox(child: Text(appointment['Note'],maxLines: 1,overflow: TextOverflow.ellipsis,style: TextStyle(color: Colors.white,fontSize: 15),))),
                                 SizedBox(width: width*0.33,),
                                  Container(
                                   alignment: Alignment.topRight,
                                 margin: EdgeInsets.fromLTRB(0,0,0,0),
-                                width: width*0.2,
-                                child: Text(appointment['Time'],style: TextStyle(color: Colors.white,fontSize: 15),)),
+                                width: width*0.22,
+                                height: height*0.05,
+                                child: FittedBox(child: Text(appointment['Time'],style: TextStyle(color: Colors.white,fontSize: 15),))),
                                 ]),
                                 SizedBox(height: height*0.02,),
                                 Container(
+                                  alignment: Alignment.topLeft,
                                 margin: EdgeInsets.fromLTRB(width*0.02,0,0,0),
                                 width: width*0.85,
-                                child: Text('Link: '+appointment['Link'],style: TextStyle(color: Colors.white,fontSize: 20),))
+                                height: 
+                                height*0.05,
+                                child: FittedBox(child: Text('Link: '+appointment['Link'],style: TextStyle(color: Colors.white,fontSize: 20),)))
                                 
                               ],));
                               

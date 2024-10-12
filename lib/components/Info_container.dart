@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/providers/enlarger_provider.dart';
 import 'package:flutter_application_1/providers/parent_info_container.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -37,8 +38,9 @@ class TextContainer extends StatefulWidget {
 
 class _TextContainerState extends State<TextContainer> {
     late bool show;
-var Slots=['5:30 - 6:30','7:00 - 8:00','9:00 - 11:00','11:00 - 12:00'];
-  var Selected=-1;
+    var slots;
+var Slots;
+  var selected=0;
   late int index;
   late double enlarged_width;
   late double enlarged_height;
@@ -46,6 +48,7 @@ var Slots=['5:30 - 6:30','7:00 - 8:00','9:00 - 11:00','11:00 - 12:00'];
   late double normal_height;
   late double height;
   late double width;
+  var time='';
   late var doctor;
   late List search_list;
     var isSelected;
@@ -54,22 +57,218 @@ var Slots=['5:30 - 6:30','7:00 - 8:00','9:00 - 11:00','11:00 - 12:00'];
   DateTime? _selectedDay; // Selected day (if any)
   late List allDoctors;
 var enlarge= false;
-bool hasAvailableSlots(DateTime date) {
-  print(DateTime(date.year, date.month, date.day));
-  print(_availableSlots.keys);
-  return _availableSlots.containsKey(DateTime(date.year, date.month, date.day));
-}
+
 var opened=false;
- final Map<DateTime, List<String>> _availableSlots = {
-    DateTime(2024, 10, 4): ['5:30'],
-    DateTime(2024, 10, 5): ['10:00', '14:00'],
-    // ... add more available slots
-  };
+ 
   var date='';
 void initState() {
     super.initState();
     isSelected = widget.isSelected;
   }
+  var parentProvider;
+void _showCustomDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,  // Prevent closing when tapping outside the dialog
+    builder: (BuildContext context) {
+      return
+Center(
+                          child: Container(
+                              alignment: Alignment.center,
+                                                  width: width*0.6,
+                                                   height: height*0.4,
+                                                  
+                                                  decoration: BoxDecoration(color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  border: Border.all(color: Colors.black,width: 2)
+                                                  ),
+                                                  child:Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Row(children:[
+                                
+                                IconButton(onPressed: (){
+                                                        parentProvider.toggleAlotDate("");
+                                                      Navigator.of(context).pop();
+                          
+                              
+                                                      }, icon: Icon(Icons.arrow_back)),
+                                                    
+                                                    
+                                                    FittedBox(
+                          
+                                                      child: Container(
+                                                        width: width*0.5,
+                                                        //margin: EdgeInsets.only(left: width*0.03),
+                                                        alignment: Alignment.topCenter, child: Text(parentProvider.alotDate,style: TextStyle(fontFamily: 'Font',fontWeight: FontWeight.bold),)),
+                                                    )
+                            ])
+                                                  , 
+                                                  Container(
+                                                    alignment: Alignment.topCenter,
+                                                    //margin: EdgeInsets.fromLTRB(0,height*0.05,0,0),
+                                                    child: Text('Slots',style: TextStyle(fontFamily: 'Font',fontSize: 22,fontWeight: FontWeight.bold),))
+                                                  ,
+                                                  Container(                            
+                                                    width: width*0.3,
+                                                    height: height*0.16,
+                                                    //margin: EdgeInsets.fromLTRB(width*0.05, height*0.11,0,0),
+                                                    child: ListView.builder(
+                                                                          itemCount: Slots.length,
+                                                                          itemBuilder: (context, index) {
+                                                                            var slot = Slots[index];
+                                                                            return Container(
+                                                                              decoration: BoxDecoration(
+                                                                                borderRadius: BorderRadius.circular(10),
+                                                                                color: selected==index? Colors.green:Colors.transparent),
+                                                                              child: TextButton(
+                                                                                onPressed: (){
+                                                                                  setState(() {
+                                                                                    time=slot;
+                                                                                  selected= index;
+                                                                  });
+                                                                                },
+                                                                                child:Text(slot,style: TextStyle(fontFamily: 'Font',color: Colors.black,fontSize: 15),)
+                                                                              ),
+                                                                            );}),
+                                                                            
+                                                  ),
+                          Center(
+                            child: Container(
+                              width: width*0.3,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Color(0xFF05696A)
+                            ),
+                            alignment: Alignment.topCenter,
+                            
+                            child: TextButton(onPressed: ()
+                            async{
+DocumentReference doctorRef = FirebaseFirestore.instance.collection('Doctors').doc('0udrDWeB2NTRglYz1E4htrucTkk2');
+DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc('0udrDWeB2NTRglYz1E4htrucTkk2');
+String doctorName='';
+String userName='';
+var profession='';
+
+    // Fetch the doctor document
+    DocumentSnapshot doctorSnapshot = await doctorRef.get();
+    if (doctorSnapshot.exists) {
+        profession = doctorSnapshot['Profession'];
+       doctorName= doctorSnapshot['Name']; // Assuming 'name' is the field
+      print('Doctor Name: $doctorName');
+    } else {
+      print('Doctor document does not exist.');
+    }
+
+    // Fetch the user document
+    DocumentSnapshot userSnapshot = await userRef.get();
+    if (userSnapshot.exists) {
+      userName = userSnapshot['name']; // Assuming 'name' is the field
+      print('User Name: $userName');
+    } else {
+      print('User document does not exist.');
+    }
+ 
+ 
+
+    String pname = userName; // Replace with actual patient's name
+    String date = parentProvider.alotDate;
+   String dName = doctorName;  // Replace with the doctor's name
+    String userId = "0udrDWeB2NTRglYz1E4htrucTkk2";       // Replace with actual user ID
+    String doctorId = "0udrDWeB2NTRglYz1E4htrucTkk2";   // Replace with actual doctor ID
+    String Link='';
+ List<dynamic> slots = doctorSnapshot['Slots']; // Assuming 'slots' is the field name
+      
+      for (var i = 0; i < slots.length; i++) {
+        var slot = slots[i];
+
+        if (slot['Date'] == date && slot['Time'] == time) {
+          // Set booked status to 1
+          Link = slot['Link'];
+          break;
+        }
+      }
+
+ 
+    // Reference to the doctor's document in Firestore
+
+    // Reference to the user's document in Firestore
+
+    // The new appointment map for the doctor
+    Map<String, String> doctorAppointment = {
+      'Pname': pname,
+      'Date': date,
+      'Time': time,
+      'Link': Link,
+      'Note': 'New person'
+    };
+
+    // The new appointment map for the user
+    Map<String, String> userAppointment = {
+      'Doctor': dName,
+      'Date': date,
+      'Time': time,
+      'Link': Link,
+    };
+
+    // Update the doctor's appointments array
+    await doctorRef.update({
+      'Appointments': FieldValue.arrayUnion([doctorAppointment])
+    }).then((_) {
+      print('Doctor\'s appointment added successfully');
+    }).catchError((error) {
+      print('Failed to add doctor\'s appointment: $error');
+    });
+
+    // Update the user's appointments array
+    await userRef.update({
+      'Appointments': FieldValue.arrayUnion([userAppointment])
+    }).then((_) {
+      print('User\'s appointment added successfully');
+    }).catchError((error) {
+      print('Failed to add user\'s appointment: $error');
+    });
+      
+      // Find the slot with the specified date and time
+      bool slotFound = false;
+      for (var i = 0; i < slots.length; i++) {
+        var slot = slots[i];
+
+        // Check if the slot matches the specified date and time
+        if (slot['Date'] == date && slot['Time'] == time) {
+          // Set booked status to 1
+          slot['Booked'] = 1; // Update the slot to booked
+          slotFound = true;
+          break;
+        }
+      }
+
+      if (slotFound) {
+        // Update the doctor's document with the modified slots array
+        await doctorRef.update({
+          'Slots': slots, // Save the modified slots array
+        });
+        print('Slot booked successfully!');
+      }
+    // You can also show a confirmation message or snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Appointment added successfully!"),
+        backgroundColor: Color(0xFF05696A),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      ),
+    );
+Navigator.of(context).pop();
+
+                            }, child: Text('Get Link!',style: TextStyle(color: Colors.white,fontFamily: 'Font'),)),),
+                          ) 
+                                                  ]),
+                                                ),
+                        );
+});}
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +285,7 @@ void initState() {
     doctor = widget.doctor;
     search_list = IndProvider.search_list;
     allDoctors = IndProvider.allDoctors;
-    var parentProvider = Provider.of<ParentInfoContainer>(context);
+    parentProvider = Provider.of<ParentInfoContainer>(context);
         return Align(
                   alignment:  Alignment.topCenter,
                   child: AnimatedContainer(
@@ -113,7 +312,7 @@ void initState() {
                    
                  
                 child:Stack(
-                      textDirection: TextDirection.ltr,
+                      
                       children: [
                     AnimatedContainer(
             
@@ -187,54 +386,116 @@ void initState() {
                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),
                         color:  widget.isUser==true? parentProvider.calendar_show==index? Colors.blueGrey:Color(0xFF05696A):   doctor['Ban']==0? Color(0xFF9B111E): Color(0xFF0F5132)
                         ),
-                        width: IndProvider.ind==index? normal_width*0.20: normal_width*0.2,
-                        height: normal_height* 0.7,
+                        width: normal_width*0.20,
+                        height:  normal_height* 0.7,
                         margin:
                          EdgeInsets.fromLTRB(IndProvider.ind==index? normal_width*0.77: normal_width*0.74,IndProvider.ind==index? normal_height*0.3: normal_height*0.1, 0,normal_height*0.1),
                         child:
                         widget.isUser==true?
-                        TextButton.icon( // Use TextButton.icon for both text and icon
-  onPressed: () {
-    if(parentProvider.calendar_show== index && IndProvider.ind==index && opened==false)
-    {
-      print('yay1');
-      parentProvider.toggleAlotDate("");
-      parentProvider.toggeCalendarShow(-1);
-      //IndProvider.toggleInd(-1);
-    }//turn off calendar
-    else if(IndProvider.ind == index && parentProvider.calendar_show!=index)
-    {
-                print('yay4');
-parentProvider.toggleAlotDate("");
-      parentProvider.toggeCalendarShow(index);  
+                        FittedBox(
+                          child: TextButton.icon( // Use TextButton.icon for both text and icon
+                            onPressed: () async{
 
-      }//open and turn on calendar
-    else if(parentProvider.calendar_show==index && IndProvider.ind==index && opened==true)
-    {
-      print('yay2');
-      parentProvider.toggleAlotDate("");
-      parentProvider.toggeCalendarShow(-1);
-      IndProvider.toggleInd(-1);
-      opened=false;
-    } //close and turn off calendar
-    else if(IndProvider.ind != index && parentProvider.calendar_show!=index)
-    {
-      print(IndProvider.ind);
-      print(index);
-            print('yay3');
-parentProvider.toggleAlotDate("");
-      IndProvider.toggleInd(index);
+                              if(parentProvider.calendar_show== index && IndProvider.ind==index && opened==false)
+                              {
+                                print('yay1');
+                                parentProvider.toggleAlotDate("");
+                                parentProvider.toggeCalendarShow(-1);
+                                //IndProvider.toggleInd(-1);
+                              }//turn off calendar
+                              else if(IndProvider.ind == index && parentProvider.calendar_show!=index)
+                              {
+                                DocumentReference docRef = FirebaseFirestore.instance.collection('Doctors').doc('0udrDWeB2NTRglYz1E4htrucTkk2');
 
-      opened=true;
-      Future.delayed(Duration(milliseconds: 300),(){
-      parentProvider.toggeCalendarShow(index);  
+  try {
+    // Get the document snapshot
+    DocumentSnapshot docSnapshot = await docRef.get();
+
+    // Check if the document exists
+    if (docSnapshot.exists) {
+      // Retrieve the 'Slots' field, which is expected to be a list of maps
+      setState(() {
+        slots = docSnapshot['Slots'];
       });
-      }//open and turn on calendar
       
-  },
-  icon: parentProvider.calendar_show==index?Icon(Icons.arrow_upward_sharp,color: Colors.white,size: 8,): Icon(Icons.arrow_drop_down,color: Colors.white,size: 8,) // Down arrow icon
-  ,label: Text('Select Slots',style: TextStyle(fontSize: 11, fontFamily: 'Font',color: Colors.white)), // Text label
-)
+      print(slots);
+      if (slots != null) {
+        // Return the list of slots
+      } else {
+        print("No slots found.");
+        return null; // No slots found
+      }
+    } else {
+      print("Document does not exist.");
+      return null; // Document does not exist
+    }
+  } catch (error) {
+    // Handle any errors that occur
+    print("Error retrieving slots: $error");
+    return null; // Return null on error
+  }
+                                          print('yay4');
+                          parentProvider.toggleAlotDate("");
+                                parentProvider.toggeCalendarShow(index);  
+                          
+                                }//open and turn on calendar
+                              else if(parentProvider.calendar_show==index && IndProvider.ind==index && opened==true)
+                              {
+                                print('yay2');
+                                parentProvider.toggleAlotDate("");
+                                parentProvider.toggeCalendarShow(-1);
+                                IndProvider.toggleInd(-1);
+                                opened=false;
+                              } //close and turn off calendar
+                              else if(IndProvider.ind != index && parentProvider.calendar_show!=index)
+                              {
+
+                                DocumentReference docRef = FirebaseFirestore.instance.collection('Doctors').doc('0udrDWeB2NTRglYz1E4htrucTkk2');
+
+  try {
+    // Get the document snapshot
+    DocumentSnapshot docSnapshot = await docRef.get();
+
+    // Check if the document exists
+    if (docSnapshot.exists) {
+      // Retrieve the 'Slots' field, which is expected to be a list of maps
+      setState(() {
+        slots = docSnapshot['Slots'];
+      });
+      
+      print(slots);
+      if (slots != null) {
+        // Return the list of slots
+      } else {
+        print("No slots found.");
+        return null; // No slots found
+      }
+    } else {
+      print("Document does not exist.");
+      return null; // Document does not exist
+    }
+  } catch (error) {
+    // Handle any errors that occur
+    print("Error retrieving slots: $error");
+    return null; // Return null on error
+  }
+                                print(IndProvider.ind);
+                                print(index);
+                                      print('yay3');
+                          parentProvider.toggleAlotDate("");
+                                IndProvider.toggleInd(index);
+                          
+                                opened=true;
+                                Future.delayed(Duration(milliseconds: 300),(){
+                                parentProvider.toggeCalendarShow(index);  
+                                });
+                                }//open and turn on calendar
+                                
+                            },
+                            icon: parentProvider.calendar_show==index?Icon(Icons.arrow_upward_sharp,color: Colors.white,size: 8,): Icon(Icons.arrow_drop_down,color: Colors.white,size: 8,) // Down arrow icon
+                            ,label: Text('Select Slots',style: TextStyle(fontSize: 30, fontFamily: 'Font',color: Colors.white)), // Text label
+                          ),
+                        )
                         :TextButton(
                                 
                                 child: Text(doctor['Ban']==0? 'Ban': 'Unban',style: TextStyle(fontFamily: 'Font',color: Colors.white),),
@@ -359,8 +620,13 @@ parentProvider.toggleAlotDate("");
                         child: TableCalendar(
                           calendarBuilders: CalendarBuilders(
     defaultBuilder: (context, day, focusedDay) {
-      print(day);
-      if (hasAvailableSlots(day)) {
+      String formattedDay = DateFormat('EEEE, MMMM d, y').format(day);
+
+          // Check if the calendar day matches any of the slot dates
+          bool isSlotDay = slots.any((slot) => slot['Date'] == formattedDay);
+
+          // If the day matches a slot's date, apply a custom style or decoration
+          if (isSlotDay) {
         return Container(
           padding: EdgeInsets.all(5),
           decoration: BoxDecoration(
@@ -370,9 +636,12 @@ parentProvider.toggleAlotDate("");
           child: InkWell(
             radius: 50,
             onTap:(){ 
-              
-                
-              parentProvider.toggleAlotDate(day.day.toString() +"-"+ day.month.toString() +"-"+ day.year.toString()); },
+              String selectedDate = DateFormat('EEEE, MMMM d, y').format(day);
+              var matchingSlots = slots.where((slot) => slot['Date'] == formattedDay).toList();
+              setState(() {
+                Slots = matchingSlots.map((slot) => slot['Time'] as String).toList();
+              }); 
+              parentProvider.toggleAlotDate(selectedDate); _showCustomDialog(context);},
               
             child:Text('${day.day}',
             style: TextStyle(color: Colors.white),
@@ -398,104 +667,22 @@ parentProvider.toggleAlotDate("");
                                             // }
                                             }),
                       )),
-                      if(parentProvider.alotDate!=''&& IndProvider.ind==index)    
-                        Stack(
-
-                          children: [AnimatedContainer(
-                            color: Colors.transparent,
-                            width: width*0.75,
-                            height: height*0.3,
-                            margin: EdgeInsets.fromLTRB(width*0.05,height*0.09,0,0),
-                                            duration: Duration(milliseconds: 300),
-                                            )
-                                            ,Center(
-                                              child: Container(
-                                                width: width*0.4,
-                                                  height: height*0.4,
-                                                
-                                                decoration: BoxDecoration(color: Colors.white,
-                                                borderRadius: BorderRadius.circular(10),
-                                                border: Border.all(color: Colors.black,width: 2)
-                                                ),
-                                                child: Stack(children:[
-                                                  AnimatedContainer(
-                                                    duration: Duration(milliseconds: 300),
-                                                    alignment: Alignment.topLeft,
-                                                    //margin: EdgeInsets.fromLTRB(width*0.02,height*0.01,0,0),
-                                                    child: IconButton(onPressed: (){
-                                                      parentProvider.toggleAlotDate("");
-                                                    setState(() {
-                                                      Selected=-1;
-                                                    });
-
-                            
-                                                    }, icon: Icon(Icons.arrow_back)),
-                                                  ),
-                                                  
-                                                  Container(
-                                                    margin: EdgeInsets.only(left: width*0.03),
-                                                    alignment: Alignment.topCenter, child: Text(parentProvider.alotDate,style: TextStyle(fontFamily: 'Font',fontSize: 25,fontWeight: FontWeight.bold),))
-                                                , 
-                                                Container(
-                                                  alignment: Alignment.topCenter,
-                                                  margin: EdgeInsets.fromLTRB(0,height*0.05,0,0),
-                                                  child: Text('Slots',style: TextStyle(fontFamily: 'Font',fontSize: 22,fontWeight: FontWeight.bold),))
-                                                ,
-                                                Container(                            
-                                                  width: width*0.3,
-                                                  height: height*0.16,
-                                                  margin: EdgeInsets.fromLTRB(width*0.05, height*0.11,0,0),
-                                                  child: ListView.builder(
-                                                                        itemCount: Slots.length,
-                                                                        itemBuilder: (context, index) {
-                                                                          var slot = Slots[index];
-                                                                          return Container(
-                                                                            decoration: BoxDecoration(
-                                                                              borderRadius: BorderRadius.circular(10),
-                                                                              color: Selected==index? Colors.green:Colors.transparent),
-                                                                            child: TextButton(
-                                                                              onPressed: (){
-                                                                                setState(() {
-                                                                                  
-                                                                                Selected= index;
-                                                                });
-                                                  
-                                                                              },
-                                                                              child:Text(slot,style: TextStyle(fontFamily: 'Font',color: Colors.black,fontSize: 15),)
-                                                                            ),
-                                                                          );}),
-                                                                          
-                                                ),
-Center(
-  child: Container(
-    width: width*0.3,
-    height: height*0.03,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Color(0xFF05696A)
-                          ),
-                          alignment: Alignment.topCenter,
-                          margin: EdgeInsets.only(top: height*0.25),
-                          child: TextButton(onPressed: ()
-                          
-                          {}, child: Text('Get Link!',style: TextStyle(color: Colors.white,fontFamily: 'Font'),)),),
-) 
-                                                ]),
-                                              ),
-                                            ),
+                        
+                      ])));
                                             
-                      ]),
+                                            
+                    
                                         
                         
                   
-                                   ],),
-                  ),
+                                   
+                  
                   
             
                 
                 
                   
-                );
+                
   
   }
 }
