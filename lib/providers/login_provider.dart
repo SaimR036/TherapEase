@@ -3,17 +3,22 @@ import 'package:flutter/foundation.dart';
 class LoginProvider extends ChangeNotifier {
   bool _isLoginView = true;  // Initial state: Login view
   bool isTherapist = false;
+  var user=0;
   var uid;
   void toggleIsTherapist() {
     isTherapist = !isTherapist; 
     notifyListeners();        // Notify widgets to rebuild
   }
 
+  void toggleUser(user1)
+  {
+    user = user1;
+    notifyListeners();
+  }
   void toggleUid(num)
   {
     uid = num;
-    print('uid');
-    print(uid);
+
     notifyListeners();
   }
 

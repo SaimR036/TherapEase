@@ -86,9 +86,9 @@ Stack(
               decoration: BoxDecoration(color: Colors.white,
               borderRadius: BorderRadius.circular(10)
               ),
-              width: width*0.58,
+              width: width*0.7,
               height: height*0.05,
-              margin:EdgeInsets.fromLTRB(width*0.07,height*0.1,0,0),
+              margin:EdgeInsets.fromLTRB(width*0.08,height*0.1,0,0),
               padding: EdgeInsets.fromLTRB(width*0.01,0,height*0.005,width*0.01),
               child:TextField(
                 controller: searcher,
@@ -116,33 +116,35 @@ Stack(
               ),
               width: width*0.10,
               height: height*0.05,
-              margin:EdgeInsets.fromLTRB(width*0.67,height*0.1,0,0),
-              child:IconButton(onPressed:(){
-                searcher.text = '';
-                provider.toggleSearchOne(false);
-                provider.toggeCalendarShow(-1);
-                IndProvider.toggleInd(-1);
-              },
-              icon: Icon(Icons.refresh_outlined),
+              margin:EdgeInsets.fromLTRB(width*0.82,height*0.1,0,0),
+              child:Center(
+                child: IconButton(onPressed:(){
+                  searcher.text = '';
+                  provider.toggleSearchOne(false);
+                  provider.toggeCalendarShow(-1);
+                  IndProvider.toggleInd(-1);
+                },
+                icon: Icon(Icons.refresh_outlined),
+                ),
               )
 
 
             ),
-            Container(
-              decoration: BoxDecoration(color: Color(0xFF29BDBD),
-              borderRadius: BorderRadius.circular(10)
-              ),
-              width: width*0.15,
-              height: height*0.05,
-              margin:EdgeInsets.fromLTRB(width*0.78,height*0.1,0,0),
-              child:TextButton(onPressed:(){},
-              child:Text('Type',style: TextStyle(
-                fontSize: 20,
-                fontFamily: 'Font',color: Colors.white),)
-              )
+            // Container(
+            //   decoration: BoxDecoration(color: Color(0xFF29BDBD),
+            //   borderRadius: BorderRadius.circular(10)
+            //   ),
+            //   width: width*0.15,
+            //   height: height*0.05,
+            //   margin:EdgeInsets.fromLTRB(width*0.78,height*0.1,0,0),
+            //   child:TextButton(onPressed:(){},
+            //   child:Text('Type',style: TextStyle(
+            //     fontSize: 20,
+            //     fontFamily: 'Font',color: Colors.white),)
+            //   )
 
 
-            ),
+            // ),
             Align(
               alignment: Alignment.topCenter,
               child: provider.isLoading==true? 

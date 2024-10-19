@@ -1,15 +1,19 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_application_1/components/bottom_navbar.dart';
 import 'package:flutter_application_1/providers/Indexes_st.dart';
+import 'package:flutter_application_1/providers/bottom_navbar_provider.dart';
 import 'package:flutter_application_1/providers/enlarger_provider.dart';
 import 'package:flutter_application_1/providers/parent_info_container.dart';
 import 'package:flutter_application_1/views/admin/Applications.dart';
+import 'package:flutter_application_1/views/doctors/App_Status.dart';
 import 'package:flutter_application_1/views/doctors/Appointments.dart';
+import 'package:flutter_application_1/views/doctors/Reviews.dart';
 import 'package:flutter_application_1/views/doctors/Slots.dart';
 import 'package:flutter_application_1/views/doctors/Therapists_Home.dart';
 import 'package:flutter_application_1/views/users/set_meet.dart';
-import 'package:flutter_application_1/views/users/Admin_panel.dart';
+import 'package:flutter_application_1/views/admin/Admin_panel.dart';
 import 'package:flutter_application_1/views/users/Instructions.dart';
 import 'package:flutter_application_1/views/users/Language.dart';
 import 'package:flutter_application_1/views/users/Login.dart';
@@ -38,6 +42,9 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => LoginProvider()),
         ChangeNotifierProvider(create: (_) => Indexes()),
         ChangeNotifierProvider(create: (_) => ParentInfoContainer()),
+        ChangeNotifierProvider(create: (_) => BottomNavbarProvider()),
+       
+        
         // ... other providers
       ],
     child:const MaterialApp(
@@ -60,7 +67,7 @@ class MyApp extends StatefulWidget { // Convert to StatefulWidget for animation
 class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-
+  
   @override
   void initState() {
     super.initState();
@@ -73,7 +80,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
         context,
         PageTransition(
       type: PageTransitionType.rightToLeft, // Or any other type
-      child:  Therapists_Home(),
+      child:  TherapistApplicationsPage(),
     ),
       );
     });

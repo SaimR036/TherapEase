@@ -322,7 +322,7 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
     height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      bottomNavigationBar: BottomNavbar(),
+      //bottomNavigationBar: BottomNavbar(),
       body: Container(
         height: height,
         width: width,

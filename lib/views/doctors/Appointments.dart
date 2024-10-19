@@ -15,7 +15,7 @@ class _Dr_AppointmentsState extends State<Dr_Appointments> {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
-      bottomNavigationBar: BottomNavbar(),
+      //bottomNavigationBar: BottomNavbar(),
       body: 
     Container(
         height: height,
@@ -71,40 +71,47 @@ class _Dr_AppointmentsState extends State<Dr_Appointments> {
                                 width: width*0.9,
                                 height: height*0.17,
                                 child:Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                 // mainAxisAlignment: MainAxisAlignment.start,
+                                  //crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                 Row(
                                   children: [
                                 Container(
+                                  alignment: Alignment.topLeft,
                                 margin: EdgeInsets.only(left: width*0.02),
-                                width: width*0.4,
+                                width: width*0.3,
                                 height: height*0.05,
-                                child: Text(appointment['Pname'],style: TextStyle(color: Colors.white,fontSize: 20),)),
-                                SizedBox(width: width*0.2,),
+                                child: FittedBox(child: Text(appointment['Pname'],style: TextStyle(color: Colors.white,fontSize: 20),))),
+                                SizedBox(width: width*0.15,),
                                 Container(
+                                  height: height*0.05,
                                   alignment: Alignment.topRight,
-                                margin: EdgeInsets.fromLTRB(0,0,0,0),
-                                width: width*0.25,
-                                child: Text(appointment['Date'],style: TextStyle(color: Colors.white,fontSize: 20),)),
+                                margin: EdgeInsets.fromLTRB(0,2,0,0),
+                                width: width*0.4,
+                                child: FittedBox(child: Text(appointment['Date'],style: TextStyle(color: Colors.white,fontSize: 20),))),
                                   ]), 
                                 Row(children: [
                                 Container(
+                                  alignment: Alignment.topLeft,
+                                  height: height*0.05,
                                 margin: EdgeInsets.fromLTRB(width*0.02,0,0,0),
                                 width: width*0.3,
-                                child: Text(appointment['Note'],maxLines: 1,overflow: TextOverflow.ellipsis,style: TextStyle(color: Colors.white,fontSize: 15),)),
-                                SizedBox(width: width*0.33,),
+                                child: FittedBox(child: Text(appointment['Note'],maxLines: 1,overflow: TextOverflow.ellipsis,style: TextStyle(color: Colors.white,fontSize: 20),))),
+                                SizedBox(width: width*0.25,),
                                  Container(
+                                  height: height*0.05,
                                   alignment: Alignment.topRight,
                                 margin: EdgeInsets.fromLTRB(0,0,0,0),
-                                width: width*0.2,
-                                child: Text(appointment['Time'],style: TextStyle(color: Colors.white,fontSize: 15),)),
+                                width: width*0.3,
+                                child: Text(appointment['Time'],style: TextStyle(color: Colors.white,fontSize: 20),)),
                                 ]),
-                                SizedBox(height: height*0.02,),
+                                SizedBox(height: height*0.005,width: width*0.0,),
                                 Container(
-                                margin: EdgeInsets.fromLTRB(width*0.02,0,0,0),
-                                width: width*0.85,
-                                child: Text('Link: '+appointment['Link'],style: TextStyle(color: Colors.white,fontSize: 20),))
+                                  alignment: Alignment.topLeft,
+                                  height: height*0.05,
+                                //margin: EdgeInsets.fromLTRB(width*0.02,0,0,0),
+                                width: width*0.86,
+                                child: FittedBox(child: Text('Link: '+appointment['Link'],style: TextStyle(color: Colors.white,fontSize: 20),)))
                                 
                               ],));
                               

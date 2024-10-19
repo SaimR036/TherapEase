@@ -9,7 +9,9 @@ import 'package:flutter_application_1/providers/login_provider.dart';
 import 'package:provider/provider.dart';
 
 class Therapists_Home extends StatefulWidget {
-  const Therapists_Home({super.key});
+  var height;
+  var width;
+  Therapists_Home({required this.height, required this.width});
 
   @override
   State<Therapists_Home> createState() => _Therapists_HomeState();
@@ -21,15 +23,19 @@ class _Therapists_HomeState extends State<Therapists_Home> {
   var paths = ['lib/assets/Deep_breath.png','lib/assets/Meditate.png','lib/assets/Brain.png'];
   var names = ['Deep breathing','Meditation','Brain Exercise'];
   var username = 'Zia';
+  var height;
+  var width;
+  @override
+  void initState() {
+    // TODO: implement initState
+    height = widget.height;
+    width = widget.width;
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
-    return Scaffold(
-      
-    bottomNavigationBar: BottomNavbar(),
-      
-      body:Container(
+
+    return Container(
         height: height,
         width: width,
             decoration: BoxDecoration(
@@ -49,10 +55,12 @@ class _Therapists_HomeState extends State<Therapists_Home> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                       children:[
                     
-              Container(
-                margin: EdgeInsets.only(left: width*0.30,top: height*0.05),
-                width: width*0.4,
-                child: FittedBox(child: Text('Welcome Back $username!',style: TextStyle(color: Colors.white,fontSize: 20),)),)
+              Center(
+                child: Container(
+                  margin: EdgeInsets.only(top: height*0.05),
+                  width: width*0.6,
+                  child: FittedBox(child: Text('Welcome Back $username!',style: TextStyle(color: Colors.white,fontSize: 40),)),),
+              )
               ,
               SizedBox(height: height*0.1,),
               Container(
@@ -112,8 +120,13 @@ class _Therapists_HomeState extends State<Therapists_Home> {
                                 Container(
                                   width: width*0.27,
                                   child: Text(review['Pname'],style: TextStyle(fontSize: 16,color: Colors.white),),),
-                                SizedBox(width: width*0.09, height: height*0.03,),
+                                SizedBox(width: width*0.07, height: height*0.03,),
                                 Container(child: Text( review['Rating'].toString(),style: TextStyle(color: Colors.white),),)
+                              ,Container(
+                                  alignment: Alignment.topRight,
+                                  width: width*0.01,
+                                  
+                                  child: Icon(Icons.star,color: Colors.white,)),
                       
                               ],),
                               SizedBox(height: height*0.003,),
@@ -168,7 +181,7 @@ class _Therapists_HomeState extends State<Therapists_Home> {
                                   borderRadius: BorderRadius.circular(10)
                                 ),
                                 width: width*0.9,
-                                height: height*0.17,
+                                //height: height*0.17,
                                 child:Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,11 +194,11 @@ class _Therapists_HomeState extends State<Therapists_Home> {
                                 width: width*0.4,
                                 height: height*0.05,
                                 child: FittedBox(child: Text(appointment['Pname'],style: TextStyle(color: Colors.white,fontSize: 20),))),
-                                SizedBox(width: width*0.1,),
+                                SizedBox(width: width*0.05,),
                                 Container(
                                   alignment: Alignment.topRight,
-                                margin: EdgeInsets.fromLTRB(0,0,0,0),
-                                width: width*0.35,
+                                margin: EdgeInsets.fromLTRB(0,2,0,0),
+                                width: width*0.4,
                                 height: height*0.05,
                                 child: FittedBox(child: Text(appointment['Date'],style: TextStyle(color: Colors.white,fontSize: 20),))),
                                   ]), 
@@ -194,14 +207,14 @@ class _Therapists_HomeState extends State<Therapists_Home> {
                                 margin: EdgeInsets.fromLTRB(width*0.02,0,0,0),
                                 width: width*0.3,
                                 height: height*0.05,
-                                child: FittedBox(child: Text(appointment['Note'],maxLines: 1,overflow: TextOverflow.ellipsis,style: TextStyle(color: Colors.white,fontSize: 15),))),
+                                child: FittedBox(child: Text(appointment['Note'],maxLines: 1,overflow: TextOverflow.ellipsis,style: TextStyle(color: Colors.white,fontSize: 20),))),
                                 SizedBox(width: width*0.33,),
                                  Container(
                                   alignment: Alignment.topRight,
                                 margin: EdgeInsets.fromLTRB(0,0,0,0),
                                 width: width*0.22,
                                 height: height*0.05,
-                                child: FittedBox(child: Text(appointment['Time'],style: TextStyle(color: Colors.white,fontSize: 15),))),
+                                child: FittedBox(child: Text(appointment['Time'],style: TextStyle(color: Colors.white,fontSize: 20),))),
                                 ]),
                                 SizedBox(height: height*0.02,),
                                 Container(
@@ -224,6 +237,6 @@ class _Therapists_HomeState extends State<Therapists_Home> {
               ]),
             )
             
-            ));
+            );
   }
 }

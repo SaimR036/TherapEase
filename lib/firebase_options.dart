@@ -41,7 +41,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDzcZH58HRLom-FaGi-qiihUXkKwvFS5HA',
+    apiKey: 'AIzaSyD4eUj1ACWMpyos66ChoLC76nVk8YFl-3g',
     appId: '1:744230371015:web:2746217244473fb373c8e2',
     messagingSenderId: '744230371015',
     projectId: 'therapease-c2a4c',
@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDbnWS_GfE3pBP5irnAdJvPc-foyKU8C10',
+    apiKey: 'AIzaSyD4eUj1ACWMpyos66ChoLC76nVk8YFl-3g',
     appId: '1:744230371015:android:b7de1885581536e173c8e2',
     messagingSenderId: '744230371015',
     projectId: 'therapease-c2a4c',
@@ -59,7 +59,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBsF9sNONYBhigvm7dWyJJVM5Sy7oOk6RU',
+    apiKey: 'AIzaSyD4eUj1ACWMpyos66ChoLC76nVk8YFl-3g',
     appId: '1:744230371015:ios:1c0fc32c2187814473c8e2',
     messagingSenderId: '744230371015',
     projectId: 'therapease-c2a4c',
@@ -77,7 +77,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDzcZH58HRLom-FaGi-qiihUXkKwvFS5HA',
+    apiKey: 'AIzaSyD4eUj1ACWMpyos66ChoLC76nVk8YFl-3g',
     appId: '1:744230371015:web:c4f48587fc180a7373c8e2',
     messagingSenderId: '744230371015',
     projectId: 'therapease-c2a4c',

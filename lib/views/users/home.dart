@@ -23,35 +23,7 @@ class _HomeState extends State<Home> {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
-      bottomNavigationBar: CurvedNavigationBar(
-        backgroundColor: Color(0xFF29BDBD),
-        height: height*0.07,
-        buttonBackgroundColor: Color(0xFF05696A),
-        color: Color(0xFF05696A),
-        animationDuration: const Duration(milliseconds: 300),
-        items: <Widget>[
-          Column(children: [Image.asset('lib/assets/home.png', height: 25),Text('Home',style: TextStyle(fontSize: 10),),
-          ],),
-          Column(children: [Image.asset('lib/assets/appointments.png', height: 25),Text('Bookings',style: TextStyle(fontSize: 10)),
-          ],),
-          Column(children: [Image.asset('lib/assets/book.png', height: 24),Text('Book',style: TextStyle(fontSize: 10)),
-          ],),
-          Column(children: [Image.asset('lib/assets/exercises.png', height: 25),Text('Exercises',style: TextStyle(fontSize: 10)),
-          ],),
-          Column(children: [Image.asset('lib/assets/settings.png', height: 25),Text('Settings',style: TextStyle(fontSize: 10)),
-          ],),
-          // const Icon(icon:Image.asset('lib/assets/home.png', height: 30), size: 26, color: Colors.white,),
-          // const Icon(Image.asset('lib/assets/appointments.png', height: 30), size: 26, color: Colors.white),
-          // const Icon(Image.asset('lib/assets/book.png', height: 30), size: 26, color: Colors.white),
-          // const Icon(Image.asset('lib/assets/exercises.png', height: 30), size: 26, color: Colors.white),
-          // const Icon(Image.asset('lib/assets/settings.png', height: 30), size: 26, color: Colors.white),
-        ],
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-      ),
+    
       //     backgroundColor: Color(0xFF05696A),
       //     icon: Image.asset('lib/assets/home.png', height: 30),
       //     label: 'Home',
@@ -232,11 +204,10 @@ class _HomeState extends State<Home> {
 
                   if (check==0 && appointmentTime.isBefore(currentTime.subtract(Duration(hours: 1)))) {
                     Future.delayed(const Duration(milliseconds: 500), () {
-                    _showReviewDialog(appointment);
+                    //_showReviewDialog(appointment);
                     });
                     check=1;
                   }
-                  print('Successfull');
                 } catch (e) {
                   print('Error parsing appointment date/time: $e');
                 }

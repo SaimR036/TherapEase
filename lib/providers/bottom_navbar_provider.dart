@@ -8,4 +8,8 @@ class BottomNavbarProvider extends ChangeNotifier {
     _selectedIndex = ind;
     notifyListeners();
   }
+  int getIndex()
+  {
+    return _selectedIndex;
+  }
 }

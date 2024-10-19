@@ -317,8 +317,8 @@ Navigator.of(context).pop();
                     AnimatedContainer(
             
                       duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 700,microseconds:0),
-                      width: IndProvider.ind==index? width*0.13: width*0.10,
-                      height:  IndProvider.ind==index? height*0.09:height * 0.1,
+                      width: IndProvider.ind==index? width*0.12: width*0.10,
+                      height:  IndProvider.ind==index? height*0.08:height * 0.1,
                       padding: EdgeInsets.fromLTRB(0,0,5,0),
                       margin: EdgeInsets.fromLTRB(normal_width*0.03,IndProvider.ind==index?normal_height*0.02: normal_height*0.1,0,normal_height*0.1),
                       child:CircleAvatar(child:Text('HI'))),
@@ -340,56 +340,75 @@ Navigator.of(context).pop();
                             fontFamily: 'Font',
                           ),
                         ),)),
-                    
                     AnimatedContainer(
-                      duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 700,microseconds:0),
-            
-                      width: IndProvider.ind==index? width*0.38:width*0.32,
-                      height: IndProvider.ind==index? height*0.03:height * 0.02,
-                      padding: EdgeInsets.fromLTRB(0.0001, 0,0,0),
-                      
-                      margin: EdgeInsets.fromLTRB(normal_width*0.19,IndProvider.ind==index?normal_height*0.65: normal_height* 0.56, 0,0),
-                      child: FittedBox( // <-- Add FittedBox widget
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        doctor['Profession'],
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                          color: Color(0xFFCECECE),
-                          fontFamily: 'Font',
-                        ),
-                      ),)),              
-                    AnimatedContainer(
-                      duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 700,microseconds:0),
-            
-                      width: IndProvider.ind==index? width*0.09: width*0.08,
-                      height:  IndProvider.ind==index? height*0.03:height * 0.02,
-                      margin: EdgeInsets.fromLTRB(IndProvider.ind==index? width*0.52: width*0.50,IndProvider.ind==index?normal_height*0.65: normal_height* 0.56, 0,0),
-                      child: FittedBox( // <-- Add FittedBox widget
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        doctor['Rating'].toString(),
-                        style: TextStyle(
-                          color: Color(0xFFCECECE),
-                          fontFamily: 'Font',
-                        ),
-                      ),)),     
-                    Container(
-                      height: height*0.01,
-                      width: width*0.01,
-                      margin: EdgeInsets.fromLTRB(normal_width*0.73,normal_height* 0.38, 0,0),
-                      // child: Image.asset('lib/assets/star.png'),),
-                                  ),
+                                        duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 700,microseconds:0),
+
+                        width: IndProvider.ind==index? width*0.45: width*0.4,
+                      margin: EdgeInsets.fromLTRB(normal_width*0.19,IndProvider.ind==index?normal_height*0.3: normal_height* 0.5, 0,0),
+                     height:  IndProvider.ind==index? height*0.09:height * 0.1,
+
+                      //margin: EdgeInsets.fromLTRB(width*0.2, height*0.1,0,0),
+                      child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                      AnimatedContainer(
+                        alignment: Alignment.topLeft,
+                        duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 700,microseconds:0),
+                                  
+                        width: IndProvider.ind==index? width*0.35:width*0.29,
+                        height: IndProvider.ind==index? height*0.04:height * 0.03,
+                        padding: EdgeInsets.fromLTRB(0.0001, 0,0,0),
+                        
+                        //margin: EdgeInsets.fromLTRB(normal_width*0.19,IndProvider.ind==index?normal_height*0.65: normal_height* 0.56, 0,0),
+                        child: FittedBox( // <-- Add FittedBox widget
+                        //alignment: Alignment.centerLeft,
+                        child: Text(
+                          doctor['Profession'],
+                         
+                          style: TextStyle(
+                            color: Color(0xFFCECECE),
+                            fontFamily: 'Font',
+                            fontSize: 40
+                          ),
+                        ),)),             
+                        SizedBox(width: IndProvider.ind==index? width*0.03: width*0.04,), 
+                      AnimatedContainer(
+                        alignment: Alignment.centerRight,
+                        duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 700,microseconds:0),
+                                  
+                        width: IndProvider.ind==index? width*0.03: width*0.02,
+                        height:  IndProvider.ind==index? height*0.04:height * 0.03,
+                       // margin: EdgeInsets.fromLTRB(IndProvider.ind==index? width*0.52: width*0.50,IndProvider.ind==index?normal_height*0.65: normal_height* 0.56, 0,0),
+                        child: FittedBox( // <-- Add FittedBox widget
+                       // alignment: Alignment.centerLeft,
+                        child: Text(
+                          doctor['Rating'].toString(),
+                          style: TextStyle(
+                            color: Color(0xFFCECECE),
+                            fontFamily: 'Font',
+                          ),
+                        ),)),  
+                        AnimatedContainer(
+                        alignment: Alignment.center,
+                          duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 700,microseconds:0),
+                        
+                                    //alignment: Alignment.topRight,
+                                    width: width*0.015,
+                                    
+                                    child: Icon(Icons.star,color: Colors.white,size: IndProvider.ind==index? height*0.04:height * 0.03,)), 
+                      ]),
+                    ),  
+                   
 
                     AnimatedContainer(
                         duration: Duration(milliseconds: 300),
                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),
                         color:  widget.isUser==true? parentProvider.calendar_show==index? Colors.blueGrey:Color(0xFF05696A):   doctor['Ban']==0? Color(0xFF9B111E): Color(0xFF0F5132)
                         ),
-                        width: normal_width*0.20,
-                        height:  normal_height* 0.7,
+                        width: normal_width*0.23,
+                        height:IndProvider.ind==index? normal_height*0.9: normal_height* 0.7,
                         margin:
-                         EdgeInsets.fromLTRB(IndProvider.ind==index? normal_width*0.77: normal_width*0.74,IndProvider.ind==index? normal_height*0.3: normal_height*0.1, 0,normal_height*0.1),
+                         EdgeInsets.fromLTRB(IndProvider.ind==index? normal_width*0.75: normal_width*0.74,IndProvider.ind==index? normal_height*0.3: normal_height*0.1, 0,normal_height*0.1),
                         child:
                         widget.isUser==true?
                         FittedBox(
@@ -492,8 +511,8 @@ Navigator.of(context).pop();
                                 }//open and turn on calendar
                                 
                             },
-                            icon: parentProvider.calendar_show==index?Icon(Icons.arrow_upward_sharp,color: Colors.white,size: 8,): Icon(Icons.arrow_drop_down,color: Colors.white,size: 8,) // Down arrow icon
-                            ,label: Text('Select Slots',style: TextStyle(fontSize: 30, fontFamily: 'Font',color: Colors.white)), // Text label
+                            icon: parentProvider.calendar_show==index?Icon(Icons.arrow_upward_sharp,color: Colors.white,size: 20,): Icon(Icons.arrow_drop_down,color: Colors.white,size: 20,) // Down arrow icon
+                            ,label: Text('Select Slots',style: TextStyle(fontSize: 20, fontFamily: 'Font',color: Colors.white)), // Text label
                           ),
                         )
                         :TextButton(
@@ -581,20 +600,44 @@ Navigator.of(context).pop();
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          Review == null?'No Reviews yet':Review['Name'],
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                        Row(children: [
+                        Container(
+                          width: width*0.3,
+                          child: FittedBox(
+                            child: Text(
+                              Review == null?'No Reviews yet':Review['Pname'],
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
+                        SizedBox(
+                          width: width*0.08,
+                        ),
+                        Container(
+                                  alignment: Alignment.topRight,
+                                  width: width*0.3,
+                                  margin: EdgeInsets.only(top: 2),
+                                  child: FittedBox(child: Text(Review['Rating'].toString(),style: TextStyle(color: Colors.white,fontSize: 15),)),)
+                        ,Container(
+                                  alignment: Alignment.topRight,
+                                  width: width*0.04,
+                                  
+                                  child: Icon(Icons.star,color: Colors.white,)),
+                      
+                        ]),
                         SizedBox(height: 8),
-                        Text(
-                           Review == null?'':Review['Description'],
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white70,
+                        Container(
+ 
+                          child: Text(
+                             Review == null?'':Review['Review'],
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white70,
+                            ),
                           ),
                         ),
                       ],

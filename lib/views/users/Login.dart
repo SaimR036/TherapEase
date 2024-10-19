@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/components/bottom_navbar.dart';
 import 'package:flutter_application_1/providers/login_provider.dart';
+import 'package:flutter_application_1/views/doctors/App_Status.dart';
 import 'package:flutter_application_1/views/users/home.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -365,6 +367,7 @@ child:SingleChildScrollView(
           email: email,
           password: password,
         );
+        print(userCredential.user?.uid);
         // 2. Handle Successful Login
         context.read<LoginProvider>().toggleUid(userCredential.user?.uid);      LoginProvider().toggleUid(userCredential.user?.uid);
         // Optional: Display a success message or navigate to another screen
@@ -376,19 +379,61 @@ child:SingleChildScrollView(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
           ),
         );
-  
-        // If using navigation with named routes:
-          Navigator.pushReplacement( 
+          CollectionReference users = FirebaseFirestore.instance.collection('users');
+
+  // Query for documents where 'email' field matches the provided email
+DocumentSnapshot userSnapshot = await users.doc(userCredential.user?.uid).get();
+
+  if (userSnapshot.exists) {
+   Provider.of<LoginProvider>(context,listen: false).toggleUser(0);
+   Navigator.pushReplacement( 
           context,
           PageTransition(
         type: PageTransitionType.rightToLeft, // Or any other type
-        child: const Home(),
+        child: const BottomNavbar(),
       ),
         );
+  }
+  else{
+     CollectionReference doctors = FirebaseFirestore.instance.collection('Doctors');
+DocumentSnapshot docSnapshot = await doctors.doc(userCredential.user?.uid).get();
+
+if (docSnapshot.exists) {
+  // Query for documents where 'email' field matches the provided email
+   Provider.of<LoginProvider>(context,listen: false).toggleUser(1);
+Navigator.pushReplacement( 
+          context,
+          PageTransition(
+        type: PageTransitionType.rightToLeft, // Or any other type
+        child: const BottomNavbar(),
+      ),
+        );
+  } 
+   
+  
+  else{
+    CollectionReference admins = FirebaseFirestore.instance.collection('Admin');
+
+  // Query for documents where 'email' field matches the provided email
+DocumentSnapshot adminSnapshot = await admins.doc(userCredential.user?.uid).get();
+if (adminSnapshot.exists) {
+   Provider.of<LoginProvider>(context,listen: false).toggleUser(2);
+   Navigator.pushReplacement( 
+          context,
+          PageTransition(
+        type: PageTransitionType.rightToLeft, // Or any other type
+        child: const BottomNavbar(),
+      ),
+        );
+  }
+  }
+  }
+        // If using navigation with named routes:
+         
       } on FirebaseAuthException catch (e) {
         // 3. Handle Firebase Auth Errors
         String errorMessage;
-  
+      print(e.code);
         if (e.code == 'user-not-found') {
           errorMessage = 'No user found for that email.';
         } else if (e.code == 'wrong-password') {
@@ -411,16 +456,38 @@ child:SingleChildScrollView(
         // 4. Handle Other Errors
         print(e); // Log unexpected errors to the console
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('An unexpected error occurred.')),
+          SnackBar(content: Text(e.toString())),
         );
       }
       }
-                      else{   //signup
+                      else{   //login
                       if (loginProvider.isTherapist==false)
                       {
                       var email = _emailController.text;
                       var password = _passwordController.text;
                       var name = _nameController.text;
+CollectionReference users = FirebaseFirestore.instance.collection('Therapist_Applications');
+
+  // Query for documents where 'email' field matches the provided email
+  QuerySnapshot querySnapshot = await users.where('Email', isEqualTo: email.toLowerCase()).get();
+
+  if (querySnapshot.docs.isNotEmpty) {
+     ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+      content: Text('Email Already Exists',style: TextStyle(fontFamily: 'Font'),),
+      backgroundColor: Color(0xFF05696A), // Dark green color
+      behavior: SnackBarBehavior.floating, // Make it floating for rounded corners
+      shape: RoundedRectangleBorder(       // Add rounded corners
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+    ),
+            );
+  }
+  else{
+
+    
+  
+
                      try {
             UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
               email: email,
@@ -434,12 +501,11 @@ child:SingleChildScrollView(
   
             });
   
-            print('Sign Up Successful');
             
             // Optional: Display a success message
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-      content: Text('Sign Up Successful',style: TextStyle(fontFamily: 'Font'),),
+      content: Text('Application submitted successfully',style: TextStyle(fontFamily: 'Font'),),
       backgroundColor: Color(0xFF05696A), // Dark green color
       behavior: SnackBarBehavior.floating, // Make it floating for rounded corners
       shape: RoundedRectangleBorder(       // Add rounded corners
@@ -484,8 +550,9 @@ child:SingleChildScrollView(
     ),
             );
           }
-                       }
-                       else{
+                       }}
+                      
+                       else{  //User sign up
 
                       var email = _emailController.text;
                       var password = _passwordController.text;
@@ -506,7 +573,7 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
     return;
   }
 
-  if (_profileImage == null || _resumeFile == null) {
+  if (_profileImage == null) {
      ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
       content: Text('Documents not uploaded',style: TextStyle(fontFamily: 'Font'),),
@@ -621,12 +688,14 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
   
   
                     
-                    child:  Text(
-                      loginProvider.isLoginView?'Log In':'Sign Up',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontFamily: 'Font',
-                        fontSize: 15,
+                    child:  FittedBox(
+                      child: Text(
+                        loginProvider.isLoginView?'Log In':'Sign Up',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: 'Font',
+                          fontSize: 15,
+                        ),
                       ),
                     ),
                   ),
@@ -718,7 +787,32 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
                     onPressed: (){
                       loginProvider.toggleView();
                     },
-                    child:Text(loginProvider.isLoginView?"Sign Up":"Log In",style: TextStyle(color: Color(0xFF05696A)),)
+                    child:Text(loginProvider.isLoginView?"Sign Up":loginProvider.isTherapist?'Submit Application':"Log In",style: TextStyle(color: Color(0xFF05696A)),)
+                )),   
+                
+    ]),
+  ),
+  if(loginProvider.isTherapist)
+   Container(
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+            Container(   
+    margin: EdgeInsets.fromLTRB(0,0, 0, 0),
+                  child:Text("Already submitted application?")
+                ),  
+                Container(   
+    margin: EdgeInsets.fromLTRB(0,0, 0, 0),
+                  child:TextButton(
+                    onPressed: (){
+                      Navigator.pushReplacement( 
+        context,
+        PageTransition(
+      type: PageTransitionType.rightToLeft, // Or any other type
+      child: App_Status(),
+    ));
+                    },
+                    child:Text("Check status",style: TextStyle(color: Color(0xFF05696A)),)
                 )),   
                 
     ]),
