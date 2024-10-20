@@ -155,7 +155,7 @@ Stack(
               
                Container(
                
-                margin: EdgeInsets.fromLTRB(0,height*0.15,0,0),
+                margin: EdgeInsets.fromLTRB(0,height*0.12,0,0),
                 child:  IndProvider.allDoctors.length!=0?
                 ListView.builder(
                       itemCount: provider.search_one==true? IndProvider.search_list.length: /*type=='All'?*/  IndProvider.allDoctors.length/*: IndProvider.allDoctors.where((doctor) => doctor['Profession'].toLowerCase() == type.toLowerCase()).toList().length*/,
@@ -196,7 +196,7 @@ Stack(
                       });
                       }
 
-                  }, label: Text('Reviews',style: TextStyle(color: Colors.white),),icon:  Icon(IndProvider.ind==index?Icons.arrow_drop_up: Icons.arrow_drop_down,color: Colors.black,),)
+                  }, label: FittedBox(child: Text('Reviews',style: TextStyle(color: Colors.white),)),icon:  Icon(IndProvider.ind==index?Icons.arrow_drop_up: Icons.arrow_drop_down,color: Colors.black,),)
                   
                   )
                     ]

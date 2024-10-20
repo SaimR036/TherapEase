@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/providers/Indexes_st.dart';
 import 'package:flutter_application_1/providers/enlarger_provider.dart';
 import 'package:flutter_application_1/providers/parent_info_container.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -37,6 +42,8 @@ class TextContainer extends StatefulWidget {
 }
 
 class _TextContainerState extends State<TextContainer> {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirebaseStorage storage = FirebaseStorage.instance;
     late bool show;
     var slots;
 var Slots;
@@ -65,86 +72,67 @@ void initState() {
     super.initState();
     isSelected = widget.isSelected;
   }
-  var parentProvider;
-void _showCustomDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    barrierDismissible: false,  // Prevent closing when tapping outside the dialog
-    builder: (BuildContext context) {
-      return
-Center(
-                          child: Container(
-                              alignment: Alignment.center,
-                                                  width: width*0.6,
-                                                   height: height*0.4,
-                                                  
-                                                  decoration: BoxDecoration(color: Colors.white,
-                                                  borderRadius: BorderRadius.circular(10),
-                                                  border: Border.all(color: Colors.black,width: 2)
-                                                  ),
-                                                  child:Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(children:[
-                                
-                                IconButton(onPressed: (){
-                                                        parentProvider.toggleAlotDate("");
-                                                      Navigator.of(context).pop();
-                          
-                              
-                                                      }, icon: Icon(Icons.arrow_back)),
-                                                    
-                                                    
-                                                    FittedBox(
-                          
-                                                      child: Container(
-                                                        width: width*0.5,
-                                                        //margin: EdgeInsets.only(left: width*0.03),
-                                                        alignment: Alignment.topCenter, child: Text(parentProvider.alotDate,style: TextStyle(fontFamily: 'Font',fontWeight: FontWeight.bold),)),
-                                                    )
-                            ])
-                                                  , 
-                                                  Container(
-                                                    alignment: Alignment.topCenter,
-                                                    //margin: EdgeInsets.fromLTRB(0,height*0.05,0,0),
-                                                    child: Text('Slots',style: TextStyle(fontFamily: 'Font',fontSize: 22,fontWeight: FontWeight.bold),))
-                                                  ,
-                                                  Container(                            
-                                                    width: width*0.3,
-                                                    height: height*0.16,
-                                                    //margin: EdgeInsets.fromLTRB(width*0.05, height*0.11,0,0),
-                                                    child: ListView.builder(
-                                                                          itemCount: Slots.length,
-                                                                          itemBuilder: (context, index) {
-                                                                            var slot = Slots[index];
-                                                                            return Container(
-                                                                              decoration: BoxDecoration(
-                                                                                borderRadius: BorderRadius.circular(10),
-                                                                                color: selected==index? Colors.green:Colors.transparent),
-                                                                              child: TextButton(
-                                                                                onPressed: (){
-                                                                                  setState(() {
-                                                                                    time=slot;
-                                                                                  selected= index;
-                                                                  });
-                                                                                },
-                                                                                child:Text(slot,style: TextStyle(fontFamily: 'Font',color: Colors.black,fontSize: 15),)
-                                                                              ),
-                                                                            );}),
-                                                                            
-                                                  ),
-                          Center(
-                            child: Container(
-                              width: width*0.3,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Color(0xFF05696A)
-                            ),
-                            alignment: Alignment.topCenter,
-                            
-                            child: TextButton(onPressed: ()
-                            async{
-DocumentReference doctorRef = FirebaseFirestore.instance.collection('Doctors').doc('0udrDWeB2NTRglYz1E4htrucTkk2');
+  File? _profileImage;
+  File? _resumeFile;
+
+  final ImagePicker _picker = ImagePicker();
+
+  // Function to pick profile picture
+  Future<void> _pickProfileImage() async {
+    final XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      setState(() {
+        _profileImage = File(pickedImage.path);
+      });
+    }
+  }
+Future<void> _showAnimatedDialog(BuildContext context) async {
+   showGeneralDialog(
+  context: context,
+  barrierDismissible: false,
+  barrierColor: Colors.black54,
+  transitionDuration: Duration(milliseconds: 200),
+  pageBuilder: (context, animation, secondaryAnimation) {
+    
+    return Center(
+      child: AlertDialog(  // Static content here
+        title: FittedBox(child: Text('Please attach Payment Screenshot',style: TextStyle(color: Color(0xFF05696A)),)),
+        content: Container(
+          height: height*0.30,
+          margin: EdgeInsets.only(bottom: 10),
+          child: 
+          Column(children: [
+          FittedBox(child: Text('Account No. 03108704010',style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold))),
+          FittedBox(child: Text('Account Title. SAIM UR REHMAN',style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold))),
+          FittedBox(child: Text('Bank Name. SADAPAY',style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold))),
+
+          Text(time.substring(9,),style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold)),
+            //TextField here
+            SizedBox(height: height*0.01,),
+Container(
+                height: height*0.05,
+                width: width*0.3,
+                decoration: BoxDecoration(color: Color(0xFF05696A),borderRadius: BorderRadius.circular(10)),
+                child: TextButton(
+                  onPressed: _pickProfileImage,
+                  child: FittedBox(child: Text('Upload Screenshot',style: TextStyle(color: Colors.white),)),
+                ),
+              ),
+              SizedBox(height: height*0.03,),
+Row(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [
+
+  Container(
+    width: width*0.2,
+    child: TextButton(onPressed: ()
+    {
+      Navigator.pop(context);
+    }, child: FittedBox(child: Text('Cancel',style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold)))),
+  ),
+          TextButton(onPressed: ()async
+          {
+            DocumentReference doctorRef = FirebaseFirestore.instance.collection('Doctors').doc('0udrDWeB2NTRglYz1E4htrucTkk2');
 DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc('0udrDWeB2NTRglYz1E4htrucTkk2');
 String doctorName='';
 String userName='';
@@ -182,7 +170,8 @@ var profession='';
       for (var i = 0; i < slots.length; i++) {
         var slot = slots[i];
 
-        if (slot['Date'] == date && slot['Time'] == time) {
+        if (slot['Date'] == date && slot['Time'] == time.substring(0,7)) {
+          print(slot);
           // Set booked status to 1
           Link = slot['Link'];
           break;
@@ -198,70 +187,176 @@ var profession='';
     Map<String, String> doctorAppointment = {
       'Pname': pname,
       'Date': date,
-      'Time': time,
+      'Time': time.substring(0,7),
       'Link': Link,
-      'Note': 'New person'
+      'Price': time.substring(9),
+      'PVerified':"0"
     };
 
     // The new appointment map for the user
     Map<String, String> userAppointment = {
       'Doctor': dName,
       'Date': date,
-      'Time': time,
+      'Time': time.substring(0,7),
       'Link': Link,
+      'Price': time.substring(9),
+      'Profession':profession,
+      'PVerified':"0"
     };
 
-    // Update the doctor's appointments array
-    await doctorRef.update({
-      'Appointments': FieldValue.arrayUnion([doctorAppointment])
-    }).then((_) {
-      print('Doctor\'s appointment added successfully');
-    }).catchError((error) {
-      print('Failed to add doctor\'s appointment: $error');
+    
+
+      try {
+    // Define the payment details
+    Map<String, String> Payment_SS = {
+      'Doctor': dName,
+      'Date': date,
+      'Time': time.substring(0, 7),
+      'Pname': pname,
+      'Price': time.substring(9),
+      'Link':Link,
+      'Profession':profession
+
+    };
+
+    // Define the storage location using the UID for the filename
+    String profilePicName = 'payment_screenshots/1.jpg';
+    
+    // Upload the file to Firebase Storage
+    UploadTask profileUploadTask = storage.ref(profilePicName).putFile(_profileImage!);
+    TaskSnapshot profileSnapshot = await profileUploadTask;
+    
+    // Get the URL of the uploaded image
+    String profileImageUrl = await profileSnapshot.ref.getDownloadURL();
+    
+    // Add the payment details along with the image URL to Firestore
+    await FirebaseFirestore.instance.collection('Payment_Screenshots').add({
+      ...Payment_SS, // Spread operator to add the fields from the Payment_SS map
+      'ImageUrl': profileImageUrl, // Add the image URL
     });
-
-    // Update the user's appointments array
-    await userRef.update({
-      'Appointments': FieldValue.arrayUnion([userAppointment])
-    }).then((_) {
-      print('User\'s appointment added successfully');
-    }).catchError((error) {
-      print('Failed to add user\'s appointment: $error');
-    });
-      
-      // Find the slot with the specified date and time
-      bool slotFound = false;
-      for (var i = 0; i < slots.length; i++) {
-        var slot = slots[i];
-
-        // Check if the slot matches the specified date and time
-        if (slot['Date'] == date && slot['Time'] == time) {
-          // Set booked status to 1
-          slot['Booked'] = 1; // Update the slot to booked
-          slotFound = true;
-          break;
-        }
-      }
-
-      if (slotFound) {
-        // Update the doctor's document with the modified slots array
-        await doctorRef.update({
-          'Slots': slots, // Save the modified slots array
-        });
-        print('Slot booked successfully!');
-      }
-    // You can also show a confirmation message or snackbar
-    ScaffoldMessenger.of(context).showSnackBar(
+    
+     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("Appointment added successfully!"),
+        content: Text("Appointment will be added upon payment approval!"),
         backgroundColor: Color(0xFF05696A),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       ),
     );
+  } catch (e) {
+     ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Error: "+e.toString()),
+        backgroundColor: Color(0xFF05696A),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      ),
+    );
+  }
+
+    // You can also show a confirmation message or snackbar
+   
+                
+
+
 Navigator.of(context).pop();
 
-                            }, child: Text('Get Link!',style: TextStyle(color: Colors.white,fontFamily: 'Font'),)),),
+          }, child: FittedBox(child: Text('Submit Payment!',style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold)))),
+])
+          ])
+          
+        )
+      )
+    );
+  }
+   );
+}
+
+  var parentProvider;
+void _showCustomDialog(BuildContext context) {
+  var provider = Provider.of<Indexes>(context,listen: false);
+    showDialog(
+    context: context,
+    barrierDismissible: false,  // Prevent closing when tapping outside the dialog
+    builder: (BuildContext context) {
+      return
+Center(
+                          child: Container(
+                              alignment: Alignment.center,
+                                                  width: width*0.7,
+                                                   height: height*0.4,
+                                                  
+                                                  decoration: BoxDecoration(color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  border: Border.all(color: Colors.black,width: 2)
+                                                  ),
+                                                  child:Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Row(children:[
+                                
+                                IconButton(onPressed: (){
+                                                        parentProvider.toggleAlotDate("");
+                                                      Navigator.of(context).pop();
+                          
+                              
+                                                      }, icon: Icon(Icons.arrow_back)),
+                                                    
+                                                    
+                                                    FittedBox(
+                          
+                                                      child: Container(
+                                                        width: width*0.5,
+                                                        //margin: EdgeInsets.only(left: width*0.03),
+                                                        alignment: Alignment.topCenter, child: FittedBox(child: Text(parentProvider.alotDate,style: TextStyle(fontFamily: 'Font',fontWeight: FontWeight.bold),))),
+                                                    )
+                            ])
+                                                  , 
+                                                  Container(
+                                                    alignment: Alignment.topCenter,
+                                                    //margin: EdgeInsets.fromLTRB(0,height*0.05,0,0),
+                                                    child: Text('Slots',style: TextStyle(fontFamily: 'Font',fontSize: 22,fontWeight: FontWeight.bold),))
+                                                  ,
+                                                  Container(                            
+                                                    width: width*0.45,
+                                                    height: height*0.16,
+                                                    //margin: EdgeInsets.fromLTRB(width*0.05, height*0.11,0,0),
+                                                    child: ListView.builder(
+                                                                          itemCount: Slots.length,
+                                                                          itemBuilder: (context, index) {
+                                                                            var slot = Slots[index];
+                                                                            return Container(
+                                                                              decoration: BoxDecoration(
+                                                                                borderRadius: BorderRadius.circular(10),
+                                                                                color: selected==index? Colors.green:Colors.transparent),
+                                                                              child: TextButton(
+                                                                                onPressed: (){
+                                                                                  setState(() {
+                                                                                    time=slot;
+                                                                                  selected= index;
+                                                                  });
+                                                                  provider.slot_Index(slot);
+                                                                                },
+                                                                                child:FittedBox(child: Text(slot,style: TextStyle(fontFamily: 'Font',color: Colors.black,fontSize: 15),))
+                                                                              ),
+                                                                            );}),
+                                                                            
+                                                  ),
+                          Center(
+                            child: Container(
+                              width: width*0.5,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Color(0xFF05696A)
+                            ),
+                            alignment: Alignment.topCenter,
+                            
+                            child: TextButton(onPressed: ()
+                            async{
+                              Navigator.pop(context);
+
+_showAnimatedDialog(context);
+                            }, child: Text('Proceed to Payment!',style: TextStyle(color: Colors.white,fontFamily: 'Font'),)),),
                           ) 
                                                   ]),
                                                 ),
@@ -395,7 +490,7 @@ Navigator.of(context).pop();
                                     //alignment: Alignment.topRight,
                                     width: width*0.015,
                                     
-                                    child: Icon(Icons.star,color: Colors.white,size: IndProvider.ind==index? height*0.04:height * 0.03,)), 
+                                    child: Icon(Icons.star,color: Colors.white,size: IndProvider.ind==index? height*0.03:height * 0.02,)), 
                       ]),
                     ),  
                    
@@ -560,10 +655,10 @@ Navigator.of(context).pop();
                       duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 200,microseconds:0),
             
                       height: height*0.1,
-                      width:  width*0.5,
+                      width:  width*0.6,
             
-                      margin: EdgeInsets.fromLTRB(enlarged_width*0.03,enlarged_height* 0.26, 0,0),
-                      child: Text('Customer Reviews',style: TextStyle(fontFamily: 'Font',fontSize: 20,color: Colors.white,),)
+                      margin: EdgeInsets.fromLTRB(enlarged_width*0.03,enlarged_height* 0.20, 0,0),
+                      child: FittedBox(child: Text('Customer Reviews',style: TextStyle(fontFamily: 'Font',fontSize: 20,color: Colors.white,),))
             
                     ),
                     if (parentProvider.show==true && IndProvider.ind ==index)
@@ -615,7 +710,7 @@ Navigator.of(context).pop();
                           ),
                         ),
                         SizedBox(
-                          width: width*0.08,
+                          width: width*0.06,
                         ),
                         Container(
                                   alignment: Alignment.topRight,
@@ -682,7 +777,7 @@ Navigator.of(context).pop();
               String selectedDate = DateFormat('EEEE, MMMM d, y').format(day);
               var matchingSlots = slots.where((slot) => slot['Date'] == formattedDay).toList();
               setState(() {
-                Slots = matchingSlots.map((slot) => slot['Time'] as String).toList();
+                Slots = matchingSlots.map((slot) => slot['Time'] + '  Rs. '+slot['Price'] as String).toList();
               }); 
               parentProvider.toggleAlotDate(selectedDate); _showCustomDialog(context);},
               

@@ -44,6 +44,12 @@ File? _profileImage;
       });
     }
   }
+  bool _isValidEmail(String email) {
+  String pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+  RegExp regex = RegExp(pattern);
+  return regex.hasMatch(email);
+}
+
 bool isPasswordStrong(String password) {
   // Example: Check for minimum length and the presence of uppercase, lowercase, and digits
   final RegExp passwordRegExp = RegExp(
@@ -230,7 +236,7 @@ child:SingleChildScrollView(
   
   // SizedBox(height: height*0.02,),
   
-            if(loginProvider.isLoginView==false)
+            if(loginProvider.isLoginView==false && loginProvider.isTherapist==false)
            Container(
               alignment: Alignment.topCenter,
                 width: width*0.7,
@@ -266,7 +272,7 @@ child:SingleChildScrollView(
     style: TextStyle(),
     decoration: InputDecoration(
       border: InputBorder.none,
-      hintText: 'Email',  // This is your placeholder text
+      hintText: loginProvider.isLoginView==false && loginProvider.isTherapist==true?'Full Name':'Email',  // This is your placeholder text
     ),
   ),),
   Container(
@@ -284,7 +290,7 @@ child:SingleChildScrollView(
     controller: _passwordController,
     decoration: InputDecoration(
       border: InputBorder.none,
-      hintText: 'Password',  // This is your placeholder text
+      hintText: loginProvider.isLoginView==false && loginProvider.isTherapist==true? 'Email':'Password',  // This is your placeholder text
     ),
   ),),
   if(loginProvider.isLoginView==false)
@@ -485,7 +491,19 @@ CollectionReference users = FirebaseFirestore.instance.collection('Therapist_App
   }
   else{
 
-    
+    if (!isPasswordStrong(password)) {
+     ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+      content: Text('Password must be 8 characters and should have uppercase,lowercase letters and one number',style: TextStyle(fontFamily: 'Font'),),
+      backgroundColor: Color(0xFF05696A), // Dark green color
+      behavior: SnackBarBehavior.floating, // Make it floating for rounded corners
+      shape: RoundedRectangleBorder(       // Add rounded corners
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+    ),
+            );
+    return;
+  }
   
 
                      try {
@@ -553,11 +571,53 @@ CollectionReference users = FirebaseFirestore.instance.collection('Therapist_App
                        }}
                       
                        else{  //User sign up
+var email; var password; var name;
 
-                      var email = _emailController.text;
-                      var password = _passwordController.text;
-                      var name = _nameController.text;
+                       
+                       if(loginProvider.isLoginView==false && loginProvider.isTherapist==true)
+                       {
+                          email = _passwordController.text;
+                          name = _emailController.text;
+                            if(!_isValidEmail(email))
+                       {
+                          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+      content: Text('Email format is not correct',style: TextStyle(fontFamily: 'Font'),),
+      backgroundColor: Color(0xFF05696A), // Dark green color
+      behavior: SnackBarBehavior.floating, // Make it floating for rounded corners
+      shape: RoundedRectangleBorder(       // Add rounded corners
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+    ),
+            );
+return;
+
+                       }
+                       }
+                       else if(loginProvider.isLoginView==false && loginProvider.isTherapist==false)
+                       {
+                        email = _emailController.text;
+                       password = _passwordController.text;
+                       name = _nameController.text;
+                       if(!_isValidEmail(email))
+                       {
+                          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+      content: Text('Email format is not correct',style: TextStyle(fontFamily: 'Font'),),
+      backgroundColor: Color(0xFF05696A), // Dark green color
+      behavior: SnackBarBehavior.floating, // Make it floating for rounded corners
+      shape: RoundedRectangleBorder(       // Add rounded corners
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+    ),
+            );
+  return;
+
+                       }
+                       }
                      try {
+                      if(loginProvider.isTherapist==false)
+                      {
 if (email.isEmpty || password.isEmpty || name.isEmpty) {
   ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -572,7 +632,23 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
     
     return;
   }
-
+                      }
+                      else{
+                        if (email.isEmpty  || name.isEmpty) {
+  ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+      content: Text('Please fill in all fields',style: TextStyle(fontFamily: 'Font'),),
+      backgroundColor: Color(0xFF05696A), // Dark green color
+      behavior: SnackBarBehavior.floating, // Make it floating for rounded corners
+      shape: RoundedRectangleBorder(       // Add rounded corners
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+    ),
+            );
+    
+    return;
+  }
+                      }
   if (_profileImage == null) {
      ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -690,7 +766,7 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
                     
                     child:  FittedBox(
                       child: Text(
-                        loginProvider.isLoginView?'Log In':'Sign Up',
+                        loginProvider.isLoginView?'Log In':loginProvider.isTherapist? 'Submit Application':'Sign Up',
                         style: TextStyle(
                           color: Colors.black,
                           fontFamily: 'Font',
@@ -712,26 +788,26 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
       
-            Container(
-      width: width * 0.08,
-      height: height * 0.06,
-      decoration: BoxDecoration(
-        color: Colors.black,
-        shape: BoxShape.circle,
-      ),
-      margin: EdgeInsets.fromLTRB(0,0, 0, 0),
-      child: IconButton(
-        padding: EdgeInsets.zero,
-        iconSize: 20,
-        onPressed: () {},
-        icon: ClipOval( // Clip the Image to be oval/circular
-          child: Image.asset(
-            'lib/assets/google_logo.webp',
-            fit: BoxFit.cover,
-          ),
-        ),
-      ),
-     ),
+    //         Container(
+    //   width: width * 0.08,
+    //   height: height * 0.06,
+    //   decoration: BoxDecoration(
+    //     color: Colors.black,
+    //     shape: BoxShape.circle,
+    //   ),
+    //   margin: EdgeInsets.fromLTRB(0,0, 0, 0),
+    //   child: IconButton(
+    //     padding: EdgeInsets.zero,
+    //     iconSize: 20,
+    //     onPressed: () {},
+    //     icon: ClipOval( // Clip the Image to be oval/circular
+    //       child: Image.asset(
+    //         'lib/assets/google_logo.webp',
+    //         fit: BoxFit.cover,
+    //       ),
+    //     ),
+    //   ),
+    //  ),
      
                 Container(
                   width: width*0.08,
@@ -746,31 +822,31 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
         onPressed: () {},
         icon: ClipOval( // Clip the Image to be oval/circular
           child: Image.asset(
-            'lib/assets/apple-logo.png',
+            'lib/assets/google_logo.webp',
             fit: BoxFit.cover,
           ),
         ),
       ),
                 ),
-                Container(
-                  width: width*0.08,
-                  height: height*0.06,    
-     decoration: BoxDecoration(
-        color: Colors.black,
-        shape: BoxShape.circle,
-      ),              margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                  child:IconButton(
-        padding: EdgeInsets.zero,
-        iconSize: 30,
-        onPressed: () {},
-        icon: ClipOval( // Clip the Image to be oval/circular
-          child: Image.asset(
-            'lib/assets/facebook_logo.webp',
-            fit: BoxFit.cover,
-          ),
-        ),
-      ),
-                ),
+    //             Container(
+    //               width: width*0.08,
+    //               height: height*0.06,    
+    //  decoration: BoxDecoration(
+    //     color: Colors.black,
+    //     shape: BoxShape.circle,
+    //   ),              margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+    //               child:IconButton(
+    //     padding: EdgeInsets.zero,
+    //     iconSize: 30,
+    //     onPressed: () {},
+    //     icon: ClipOval( // Clip the Image to be oval/circular
+    //       child: Image.asset(
+    //         'lib/assets/facebook_logo.webp',
+    //         fit: BoxFit.cover,
+    //       ),
+    //     ),
+    //   ),
+    //             ),
      ]),
    ),
   Container(
@@ -779,7 +855,7 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
       children: [
             Container(   
     margin: EdgeInsets.fromLTRB(0,0, 0, 0),
-                  child:Text("Don't have an account?")
+                  child:Text(loginProvider.isLoginView? "Don't have an account?":"Already have an account?")
                 ),  
                 Container(   
     margin: EdgeInsets.fromLTRB(0,0, 0, 0),
@@ -787,7 +863,7 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
                     onPressed: (){
                       loginProvider.toggleView();
                     },
-                    child:Text(loginProvider.isLoginView?"Sign Up":loginProvider.isTherapist?'Submit Application':"Log In",style: TextStyle(color: Color(0xFF05696A)),)
+                    child:Text(loginProvider.isLoginView && loginProvider.isTherapist?"Submit Application":loginProvider.isLoginView && loginProvider.isTherapist==false?"Sign Up":"Log In",style: TextStyle(color: Color(0xFF05696A)),)
                 )),   
                 
     ]),

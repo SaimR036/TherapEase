@@ -2,13 +2,16 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_application_1/components/bottom_navbar.dart';
+import 'package:flutter_application_1/providers/Firebase_data.dart';
 import 'package:flutter_application_1/providers/Indexes_st.dart';
 import 'package:flutter_application_1/providers/bottom_navbar_provider.dart';
 import 'package:flutter_application_1/providers/enlarger_provider.dart';
 import 'package:flutter_application_1/providers/parent_info_container.dart';
+import 'package:flutter_application_1/views/admin/Admin_Payments.dart';
 import 'package:flutter_application_1/views/admin/Applications.dart';
 import 'package:flutter_application_1/views/doctors/App_Status.dart';
 import 'package:flutter_application_1/views/doctors/Appointments.dart';
+import 'package:flutter_application_1/views/doctors/Bank_Details.dart';
 import 'package:flutter_application_1/views/doctors/Reviews.dart';
 import 'package:flutter_application_1/views/doctors/Slots.dart';
 import 'package:flutter_application_1/views/doctors/Therapists_Home.dart';
@@ -43,6 +46,8 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => Indexes()),
         ChangeNotifierProvider(create: (_) => ParentInfoContainer()),
         ChangeNotifierProvider(create: (_) => BottomNavbarProvider()),
+        ChangeNotifierProvider(create: (_) => CloudData()),
+
        
         
         // ... other providers
@@ -80,7 +85,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
         context,
         PageTransition(
       type: PageTransitionType.rightToLeft, // Or any other type
-      child:  TherapistApplicationsPage(),
+      child:  PaymentApprovalPage(),
     ),
       );
     });
@@ -101,31 +106,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
     final height = MediaQuery.of(context).size.height;
     var _selectedIndex=0;
     return Scaffold(
-      bottomNavigationBar: CurvedNavigationBar(
-        backgroundColor: Color(0xFF29BDBD),
-        height: height*0.07,
-        buttonBackgroundColor: Color(0xFF05696A),
-        color: Color(0xFF05696A),
-        animationDuration: const Duration(milliseconds: 300),
-        items: <Widget>[
-          Column(children: [Image.asset('lib/assets/reviews.png', height: 25),Text('Reviews',style: TextStyle(fontSize: 10),),
-          ],),
-          Column(children: [Image.asset('lib/assets/appointments.png', height: 25),Text('Appointments',style: TextStyle(fontSize: 10)),
-          ],),
-          Column(children: [Image.asset('lib/assets/home.png', height: 24),Text('Home',style: TextStyle(fontSize: 10)),
-          ],),
-          Column(children: [Image.asset('lib/assets/slots.png', height: 25),Text('Slots',style: TextStyle(fontSize: 10)),
-          ],),
-          Column(children: [Image.asset('lib/assets/settings.png', height: 25),Text('Settings',style: TextStyle(fontSize: 10)),
-          ],),
-         
-        ],
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-      ),
+    
       body: Stack(
         children: [
           Container(
@@ -145,7 +126,9 @@ Color(0xFF29BDBD), // Second hex color (Red)
           FadeTransition(
             opacity: _fadeAnimation,
             child: Container(
-              margin: EdgeInsets.fromLTRB(0.25 * width, 0.4 * height, 0, 0),
+              alignment: Alignment.topCenter,
+              margin: EdgeInsets.fromLTRB(0, 0.40 * height,0,0),
+
               child: Text(
                 'TherapEase',
                 style: TextStyle(
@@ -159,7 +142,9 @@ Color(0xFF29BDBD), // Second hex color (Red)
           FadeTransition(
             opacity: _fadeAnimation,
             child: Container(
-              margin: EdgeInsets.fromLTRB(0.36 * width, 0.47 * height, 0, 0),
+              alignment: Alignment.topCenter,
+
+              margin: EdgeInsets.fromLTRB(0, 0.48 * height,0,0),
               child: const Text(
                 'Therapy made easy',
                 style: TextStyle(

@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/providers/login_provider.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart'; // Add this package to format dates
 
@@ -13,6 +16,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
   var _selectedIndex=0;
   var  Name='';
   var paths = ['lib/assets/Deep_breath.png','lib/assets/Meditate.png','lib/assets/Brain.png'];
@@ -260,13 +264,21 @@ class _HomeState extends State<Home> {
                                 child: FittedBox(child: Text(details['Time'],style: TextStyle(color: Colors.white,fontSize: 15),))),
                                 ]),
                                 SizedBox(height: height*0.02,),
+                                Row(children: [
                                 Container(
                                   alignment: Alignment.topLeft,
                                 margin: EdgeInsets.fromLTRB(width*0.02,0,0,0),
-                                width: width*0.7,
+                                width: width*0.65,
                                 height: height*0.05,
                                 child: FittedBox(child: Text(details['Link'],style: TextStyle(color: Colors.white,fontSize: 20),)))
-                                
+                                ,SizedBox(width: width*0.03,),
+                                Container(
+                                  alignment: Alignment.topRight,
+                                margin: EdgeInsets.fromLTRB(width*0.02,0,0,0),
+                                width: width*0.15,
+                                height: height*0.05,
+                                child: FittedBox(child: Text('Rs. '+details['Price'],style: TextStyle(color: Colors.white,fontSize: 20),)))
+                                ])
                               ],));
                               
                               }),

@@ -97,7 +97,7 @@ class _DrSlotsState extends State<DrSlots> {
 
 
 
-
+var _priceController = TextEditingController();
   var display = false;
   var display_str = '';
   var display_calendar = false;
@@ -121,14 +121,15 @@ class _DrSlotsState extends State<DrSlots> {
   }
   return ''; // Return empty string if date or time is not selected
 }
- Future<void> addSlotToFirebase(link) async {
+ Future<void> addSlotToFirebase(link,price) async {
 
       // Define the slot to add
       Map<String, String> slot = {
         'Date': finaltime.split(';')[0],
         'Time': finaltime.split(';')[1],
         'Booked':'0',
-        'Link':link
+        'Link':link,
+        'Price':price
       };
 
       // Reference to the Firebase document (you can adjust the path to match your structure)
@@ -206,14 +207,58 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
     return Center(
       child: AlertDialog(  // Static content here
         title: slot!=null?Text('Delete Slot?',style: TextStyle(color: Colors.black),):Text('Slot Confirmation',style: TextStyle(color: Color(0xFF05696A)),),
-        content: slot!=null?Text(slot['Date']+';'+slot['Time'],style: TextStyle(color: Colors.red,fontSize: 20,fontWeight: FontWeight.bold)):Text(finaltime,style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold)),
+        content: Container(
+          height:  slot!=null? null:height*0.17,
+          child: slot!=null?Text(slot['Date']+';'+slot['Time'],style: TextStyle(color: Colors.red,fontSize: 20,fontWeight: FontWeight.bold)):
+          Column(children: [
+          Text(finaltime,style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold)),
+          Row(children: [
+            Text('Price',style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold)),
+            //TextField here
+          SizedBox(width: 16.0),
+                            Container(
+                              height: height*0.1,
+                              width: width*0.5,
+                              child: TextField(
+                                controller: _priceController,
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  hintText: 'Enter price',
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey,
+                                  ),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.grey),
+                                  ),
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.grey),
+                                  ),
+                                ),
+                              ),
+                            ),
+          
+          ],)
+          ]),
+        ),
         actions: [
           TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Cancel',style: TextStyle(color: Color(0xFF05696A)))),
           TextButton(onPressed: ()async{
         if (slot==null)
         {
           String link = await GetMeetLink();
-          if (link=='')
+          if(_priceController.text.isEmpty)
+          {
+               ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please enter a price"), // Success message
+          backgroundColor: Color(0xFF05696A),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+        ),
+      );
+      return;
+          }
+          else if (link=='')
           {
             ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -223,10 +268,11 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
         ),
       );
+      return;
           }
           else
           {
-        addSlotToFirebase(link);
+        addSlotToFirebase(link,_priceController.text);
           }
           }
         else
@@ -446,7 +492,7 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
                 child: FittedBox(child: Text('Slots Details',style: TextStyle(color: Colors.white,fontSize: 30),)),),
                Container(
                   width: width*0.85,
-                  height: height*0.4,
+                  height: height*0.5,
                   margin: EdgeInsets.only(left: width*0.075),
                   child: StreamBuilder( //
                       stream: FirebaseFirestore.instance.collection('Doctors').doc('0udrDWeB2NTRglYz1E4htrucTkk2').snapshots(),
@@ -495,15 +541,24 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
                                 width: width*0.23,
                                 child: Text(Slot['Time'],style: TextStyle(color: Colors.white,fontSize: 18),)),
                                   ]), 
+                                  Row(
+                                   // mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
                                 if(Slot['Booked']=='0')
                                 Container(
+                                  alignment: Alignment.topLeft,
                                   margin: EdgeInsets.all(5),
                                   decoration: BoxDecoration(color: Colors.red,borderRadius: BorderRadius.circular(10)),
                                   child: FittedBox(child: TextButton(onPressed: ()async{
                                  _showCustomDialog(context, Slot);
 
                                 }, child: Text('Delete',style: TextStyle(color: Colors.white),)),),)
-                              
+                              ,Container(
+                                //width: width*0.3,
+                                alignment: Alignment.topRight,
+                                  margin: EdgeInsets.only(left: width*0.02),
+                                  child: FittedBox(child:  Text('Rs. '+Slot['Price'],style: TextStyle(color: Colors.white,fontSize: 16),)),),
+                                  ])
                               ],));
                               
                               }),

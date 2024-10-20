@@ -36,9 +36,11 @@ class _TherapistsState extends State<Therapists> {
             Align(
               alignment: Alignment.topCenter,
               child: Container(
-              margin: EdgeInsets.fromLTRB(width*0.1,height*0.05,width*0.1,0),  
-              child: Text('Our Therapy Team.',
-              style: TextStyle(fontSize: 30,color: Colors.white,fontFamily: 'Font'),
+             margin: EdgeInsets.fromLTRB(0,height*0.05,0,0),  
+              child: FittedBox(
+                child: Text('Our Therapy Team.',
+                style: TextStyle(fontSize: 30,color: Colors.white,fontFamily: 'Font'),
+                ),
               ),),
             ),
            Container(

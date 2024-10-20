@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/views/doctors/Bank_Details.dart';
+import 'package:page_transition/page_transition.dart';
 
 class App_Status extends StatefulWidget {
   const App_Status({super.key});
@@ -84,7 +86,7 @@ CollectionReference users = FirebaseFirestore.instance.collection('Therapist_App
     ),
             );
     }
-    else{
+    else if(status=='0'){
 
        ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -97,6 +99,36 @@ CollectionReference users = FirebaseFirestore.instance.collection('Therapist_App
     ),
             );
     }
+  else if(status=='2')
+  {
+     ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+      content: Text('Application Approved.',style: TextStyle(fontFamily: 'Font'),),
+      backgroundColor: Colors.blueGrey, // Dark green color
+      behavior: SnackBarBehavior.floating, // Make it floating for rounded corners
+      shape: RoundedRectangleBorder(       // Add rounded corners
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+    ),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+      content: Text('Please provide necessary details to complete Sign Up',style: TextStyle(fontFamily: 'Font'),),
+      backgroundColor: Colors.blueGrey, // Dark green color
+      behavior: SnackBarBehavior.floating, // Make it floating for rounded corners
+      shape: RoundedRectangleBorder(       // Add rounded corners
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+    ),
+            );
+             Navigator.pushReplacement( 
+          context,
+          PageTransition(
+        type: PageTransitionType.rightToLeft, // Or any other type
+        child:  BankDetails(details: doc,),
+      ),
+        );
+  }
   }
   else{
       ScaffoldMessenger.of(context).showSnackBar(

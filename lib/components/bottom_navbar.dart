@@ -37,7 +37,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
       _pages = [
         Reviews(),                 // Index 0
         Dr_Appointments(),         // Index 1
-        Therapists_Home(height: height, width: width),   // Index 2
+        Therapists_Home(),   // Index 2
         DrSlots(),                 // Index 3
         DrSlots()                  // Add another page for Settings if required
       ];
