@@ -5,14 +5,18 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/providers/Indexes_st.dart';
 import 'package:flutter_application_1/providers/enlarger_provider.dart';
+import 'package:flutter_application_1/providers/login_provider.dart';
 import 'package:flutter_application_1/providers/parent_info_container.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:math';
+
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 // Define the reusable Container component
 class TextContainer extends StatefulWidget {
+  late final String id;
   late final bool show;
   late final int index;
   late final double enlargedWidth;
@@ -25,6 +29,7 @@ class TextContainer extends StatefulWidget {
   var isSelected;
   var isUser;
   TextContainer({
+    required this.id,
     required this.show,
     required this.index,
     required this.enlargedWidth,
@@ -52,10 +57,11 @@ var Slots;
   late double enlarged_width;
   late double enlarged_height;
   late double normal_width;
+ var uid;
   late double normal_height;
   late double height;
   late double width;
-  var time='';
+  var isLoading = true;
   late var doctor;
   late List search_list;
     var isSelected;
@@ -64,7 +70,7 @@ var Slots;
   DateTime? _selectedDay; // Selected day (if any)
   late List allDoctors;
 var enlarge= false;
-
+var to_ban;
 var opened=false;
  
   var date='';
@@ -72,7 +78,7 @@ void initState() {
     super.initState();
     isSelected = widget.isSelected;
   }
-  File? _profileImage;
+  File? _profileImage=null;
   File? _resumeFile;
 
   final ImagePicker _picker = ImagePicker();
@@ -97,16 +103,19 @@ Future<void> _showAnimatedDialog(BuildContext context) async {
     return Center(
       child: AlertDialog(  // Static content here
         title: FittedBox(child: Text('Please attach Payment Screenshot',style: TextStyle(color: Color(0xFF05696A)),)),
-        content: Container(
-          height: height*0.30,
+        content: Consumer<ParentInfoContainer>( // Use Consumer here
+              builder: (context, provider, child) {
+                return Container(
+          height: height*0.32,
           margin: EdgeInsets.only(bottom: 10),
-          child: 
+          child:   provider.fetching?
+          Center(child: CircularProgressIndicator(color: Colors.green,),):
           Column(children: [
           FittedBox(child: Text('Account No. 03108704010',style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold))),
           FittedBox(child: Text('Account Title. SAIM UR REHMAN',style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold))),
           FittedBox(child: Text('Bank Name. SADAPAY',style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold))),
 
-          Text(time.substring(9,),style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold)),
+          Text(provider.time.substring(provider.time.indexOf('R')),style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold)),
             //TextField here
             SizedBox(height: height*0.01,),
 Container(
@@ -130,10 +139,26 @@ Row(
       Navigator.pop(context);
     }, child: FittedBox(child: Text('Cancel',style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold)))),
   ),
+  
           TextButton(onPressed: ()async
           {
-            DocumentReference doctorRef = FirebaseFirestore.instance.collection('Doctors').doc('0udrDWeB2NTRglYz1E4htrucTkk2');
-DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc('0udrDWeB2NTRglYz1E4htrucTkk2');
+            if(!provider.fetching)
+            {
+              if (_profileImage == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Please add the payment screenshot!"),
+        backgroundColor: Color(0xFF05696A),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      ),
+    );
+                  return;
+              }
+            provider.toggleFetching();
+
+            DocumentReference doctorRef = FirebaseFirestore.instance.collection('Doctors').doc(widget.id);
+DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(uid);
 String doctorName='';
 String userName='';
 var profession='';
@@ -157,20 +182,19 @@ var profession='';
       print('User document does not exist.');
     }
  
- 
+  print('TIMEEEEEEEEEEE:'+provider.time.substring(0,7));
 
     String pname = userName; // Replace with actual patient's name
     String date = parentProvider.alotDate;
    String dName = doctorName;  // Replace with the doctor's name
-    String userId = "0udrDWeB2NTRglYz1E4htrucTkk2";       // Replace with actual user ID
-    String doctorId = "0udrDWeB2NTRglYz1E4htrucTkk2";   // Replace with actual doctor ID
+    String userId = uid;
+    String doctorId = widget.id;   // Replace with actual doctor ID
     String Link='';
  List<dynamic> slots = doctorSnapshot['Slots']; // Assuming 'slots' is the field name
-      
       for (var i = 0; i < slots.length; i++) {
         var slot = slots[i];
 
-        if (slot['Date'] == date && slot['Time'] == time.substring(0,7)) {
+        if (slot['Date'] == date && slot['Time'] == provider.time.substring(0,7)) {
           print(slot);
           // Set booked status to 1
           Link = slot['Link'];
@@ -187,21 +211,19 @@ var profession='';
     Map<String, String> doctorAppointment = {
       'Pname': pname,
       'Date': date,
-      'Time': time.substring(0,7),
+      'Time': provider.time.substring(0,provider.time.indexOf('R')),
       'Link': Link,
-      'Price': time.substring(9),
-      'PVerified':"0"
+      'Price': provider.time.substring(provider.time.indexOf('R')+4),
     };
 
     // The new appointment map for the user
     Map<String, String> userAppointment = {
       'Doctor': dName,
       'Date': date,
-      'Time': time.substring(0,7),
+      'Time': provider.time.substring(0,provider.time.indexOf('R')),
       'Link': Link,
-      'Price': time.substring(9),
+      'Price': provider.time.substring(provider.time.indexOf('R')+4),
       'Profession':profession,
-      'PVerified':"0"
     };
 
     
@@ -209,19 +231,22 @@ var profession='';
       try {
     // Define the payment details
     Map<String, String> Payment_SS = {
+      'DocId':widget.id,
       'Doctor': dName,
       'Date': date,
-      'Time': time.substring(0, 7),
+      'Time': provider.time.substring(0,provider.time.indexOf('R')),
       'Pname': pname,
-      'Price': time.substring(9),
+      'Price': provider.time.substring(provider.time.indexOf('R')+4),
       'Link':Link,
-      'Profession':profession
+      'Profession':profession,
+      'Uid':uid
 
     };
 
     // Define the storage location using the UID for the filename
-    String profilePicName = 'payment_screenshots/1.jpg';
-    
+
+final randomNumber = Random().nextInt(900000) + 100000; // Generates a random 6-digit number
+String profilePicName = 'payment_screenshots/$randomNumber.jpg';    
     // Upload the file to Firebase Storage
     UploadTask profileUploadTask = storage.ref(profilePicName).putFile(_profileImage!);
     TaskSnapshot profileSnapshot = await profileUploadTask;
@@ -243,6 +268,7 @@ var profession='';
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       ),
     );
+    _profileImage = null;
   } catch (e) {
      ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -252,7 +278,12 @@ var profession='';
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       ),
     );
+        _profileImage = null;
+
   }
+provider.toggleFetching();
+            print('PROVIDERRR') ;
+            print(provider.fetching);
 
     // You can also show a confirmation message or snackbar
    
@@ -260,12 +291,15 @@ var profession='';
 
 
 Navigator.of(context).pop();
+            }
 
-          }, child: FittedBox(child: Text('Submit Payment!',style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold)))),
-])
+          }, child: Container(
+            margin: EdgeInsets.all(10),
+            child:  FittedBox(child: Text('Submit Payment!',style: TextStyle(color: Color(0xFF05696A),fontSize: 17,fontWeight: FontWeight.bold)))),
+)])
           ])
-          
-        )
+              );
+  })
       )
     );
   }
@@ -273,7 +307,7 @@ Navigator.of(context).pop();
 }
 
   var parentProvider;
-void _showCustomDialog(BuildContext context) {
+void _showCustomDialog(BuildContext context,loadingProvider) {
   var provider = Provider.of<Indexes>(context,listen: false);
     showDialog(
     context: context,
@@ -321,25 +355,35 @@ Center(
                                                     width: width*0.45,
                                                     height: height*0.16,
                                                     //margin: EdgeInsets.fromLTRB(width*0.05, height*0.11,0,0),
-                                                    child: ListView.builder(
+                                                    child: Consumer<ParentInfoContainer>( // Use Consumer here
+              builder: (context, provider, child) {
+                return ListView.builder(
                                                                           itemCount: Slots.length,
                                                                           itemBuilder: (context, index) {
+                                                                            if(Slots.length>0)
+                                                                            {
+                                                                              provider.toggleTime(Slots[index]);
+                                                                            }
                                                                             var slot = Slots[index];
                                                                             return Container(
                                                                               decoration: BoxDecoration(
                                                                                 borderRadius: BorderRadius.circular(10),
-                                                                                color: selected==index? Colors.green:Colors.transparent),
+                                                                                color: provider.selected_slot_index==index? Colors.green:Colors.transparent),
                                                                               child: TextButton(
                                                                                 onPressed: (){
-                                                                                  setState(() {
-                                                                                    time=slot;
-                                                                                  selected= index;
-                                                                  });
-                                                                  provider.slot_Index(slot);
+                                                                                  provider.toggleSelectedSlot(index);
+                                                                                  provider.toggleTime(slot);
+                                                                  //                 setState(() {
+                                                                  //                   time=slot;
+                                                                  //                 selected= index;
+                                                                  // });
                                                                                 },
                                                                                 child:FittedBox(child: Text(slot,style: TextStyle(fontFamily: 'Font',color: Colors.black,fontSize: 15),))
                                                                               ),
-                                                                            );}),
+                                                                            );}
+                );
+              }
+                                                                            ),
                                                                             
                                                   ),
                           Center(
@@ -367,9 +411,11 @@ _showAnimatedDialog(context);
 
   @override
   Widget build(BuildContext context) {
+    var loadingProvider = Provider.of<ParentInfoContainer>(context);
     var IndProvider = Provider.of<EnlargerProvider>(context);
     show = widget.show;
-    
+    uid = Provider.of<LoginProvider>(context).uid;
+
     index = widget.index;
     enlarged_width = widget.enlargedWidth;
     enlarged_height = widget.enlargedHeight;
@@ -416,7 +462,11 @@ _showAnimatedDialog(context);
                       height:  IndProvider.ind==index? height*0.08:height * 0.1,
                       padding: EdgeInsets.fromLTRB(0,0,5,0),
                       margin: EdgeInsets.fromLTRB(normal_width*0.03,IndProvider.ind==index?normal_height*0.02: normal_height*0.1,0,normal_height*0.1),
-                      child:CircleAvatar(child:Text('HI'))),
+                      child:CircleAvatar(
+                backgroundImage:
+                    NetworkImage("${doctor['ImageUrl']}"),
+                backgroundColor: Colors.transparent,
+              )),
                     AnimatedContainer(
                       duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 700,microseconds:0),
                         width: IndProvider.ind==index? width*0.45: width*0.4,
@@ -426,15 +476,17 @@ _showAnimatedDialog(context);
                         margin: EdgeInsets.fromLTRB(normal_width*0.19,IndProvider.ind==index?normal_height*0.008: normal_height* 0.06, 0,0),
                         child: FittedBox( // <-- Add FittedBox widget
                         alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Dr. '+doctor['Name'],
-                          
-                  
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Font',
-                          ),
-                        ),)),
+                        child:Text(
+         "Dr. ${doctor['Name']}" ,
+        style: TextStyle(
+          color: Colors.white,
+          fontFamily: 'Font',
+        ),
+      )
+   
+                         
+                        )),
+                       // if(to_ban==1)
                     AnimatedContainer(
                                         duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 700,microseconds:0),
 
@@ -507,120 +559,134 @@ _showAnimatedDialog(context);
                         child:
                         widget.isUser==true?
                         FittedBox(
-                          child: TextButton.icon( // Use TextButton.icon for both text and icon
-                            onPressed: () async{
+                            child: loadingProvider.fetching?
+                            Container(
+                              margin: EdgeInsets.all(10),
 
-                              if(parentProvider.calendar_show== index && IndProvider.ind==index && opened==false)
-                              {
-                                print('yay1');
-                                parentProvider.toggleAlotDate("");
-                                parentProvider.toggeCalendarShow(-1);
-                                //IndProvider.toggleInd(-1);
-                              }//turn off calendar
-                              else if(IndProvider.ind == index && parentProvider.calendar_show!=index)
-                              {
-                                DocumentReference docRef = FirebaseFirestore.instance.collection('Doctors').doc('0udrDWeB2NTRglYz1E4htrucTkk2');
+                              child: CircularProgressIndicator(color: Colors.white,)):
+                             TextButton.icon( // Use TextButton.icon for both text and icon
+                              onPressed: () async{
 
-  try {
-    // Get the document snapshot
-    DocumentSnapshot docSnapshot = await docRef.get();
 
-    // Check if the document exists
-    if (docSnapshot.exists) {
-      // Retrieve the 'Slots' field, which is expected to be a list of maps
-      setState(() {
-        slots = docSnapshot['Slots'];
-      });
-      
-      print(slots);
-      if (slots != null) {
-        // Return the list of slots
-      } else {
-        print("No slots found.");
-        return null; // No slots found
-      }
-    } else {
-      print("Document does not exist.");
-      return null; // Document does not exist
-    }
-  } catch (error) {
-    // Handle any errors that occur
-    print("Error retrieving slots: $error");
-    return null; // Return null on error
-  }
-                                          print('yay4');
-                          parentProvider.toggleAlotDate("");
-                                parentProvider.toggeCalendarShow(index);  
+                          if(!loadingProvider.fetching)
+                          {
+                                if(parentProvider.calendar_show== index && IndProvider.ind==index && opened==false)
+                                {
+                                  print('yay1');
+                                  parentProvider.toggleAlotDate("");
+                                  parentProvider.toggeCalendarShow(-1);
+                                  //IndProvider.toggleInd(-1);
+                                }//turn off calendar
+                                else if(IndProvider.ind == index && parentProvider.calendar_show!=index)
+                                {
+                                  loadingProvider.toggleFetching();
+                                  DocumentReference docRef = FirebaseFirestore.instance.collection('Doctors').doc(widget.id);
                           
-                                }//open and turn on calendar
-                              else if(parentProvider.calendar_show==index && IndProvider.ind==index && opened==true)
-                              {
-                                print('yay2');
-                                parentProvider.toggleAlotDate("");
-                                parentProvider.toggeCalendarShow(-1);
-                                IndProvider.toggleInd(-1);
-                                opened=false;
-                              } //close and turn off calendar
-                              else if(IndProvider.ind != index && parentProvider.calendar_show!=index)
-                              {
-
-                                DocumentReference docRef = FirebaseFirestore.instance.collection('Doctors').doc('0udrDWeB2NTRglYz1E4htrucTkk2');
-
-  try {
-    // Get the document snapshot
-    DocumentSnapshot docSnapshot = await docRef.get();
-
-    // Check if the document exists
-    if (docSnapshot.exists) {
-      // Retrieve the 'Slots' field, which is expected to be a list of maps
-      setState(() {
-        slots = docSnapshot['Slots'];
-      });
-      
-      print(slots);
-      if (slots != null) {
-        // Return the list of slots
-      } else {
-        print("No slots found.");
-        return null; // No slots found
-      }
-    } else {
-      print("Document does not exist.");
-      return null; // Document does not exist
-    }
-  } catch (error) {
-    // Handle any errors that occur
-    print("Error retrieving slots: $error");
-    return null; // Return null on error
-  }
-                                print(IndProvider.ind);
-                                print(index);
-                                      print('yay3');
-                          parentProvider.toggleAlotDate("");
-                                IndProvider.toggleInd(index);
-                          
-                                opened=true;
-                                Future.delayed(Duration(milliseconds: 300),(){
-                                parentProvider.toggeCalendarShow(index);  
+                            try {
+                              // Get the document snapshot
+                              DocumentSnapshot docSnapshot = await docRef.get();
+                          loadingProvider.toggleFetching();
+                              // Check if the document exists
+                              if (docSnapshot.exists) {
+                                // Retrieve the 'Slots' field, which is expected to be a list of maps
+                                setState(() {
+                                  slots = docSnapshot['Slots'];
                                 });
-                                }//open and turn on calendar
                                 
-                            },
-                            icon: parentProvider.calendar_show==index?Icon(Icons.arrow_upward_sharp,color: Colors.white,size: 20,): Icon(Icons.arrow_drop_down,color: Colors.white,size: 20,) // Down arrow icon
-                            ,label: Text('Select Slots',style: TextStyle(fontSize: 20, fontFamily: 'Font',color: Colors.white)), // Text label
-                          ),
-                        )
+                                print(slots);
+                                if (slots != null) {
+                                  // Return the list of slots
+                                } else {
+                                  print("No slots found.");
+                                  return null; // No slots found
+                                }
+                              } else {
+                                print("Document does not exist.");
+                                return null; // Document does not exist
+                              }
+                            } catch (error) {
+                              // Handle any errors that occur
+                              print("Error retrieving slots: $error");
+                              return null; // Return null on error
+                            }
+                                            print('yay4');
+                            parentProvider.toggleAlotDate("");
+                                  parentProvider.toggeCalendarShow(index);  
+                            
+                                  }//open and turn on calendar
+                                else if(parentProvider.calendar_show==index && IndProvider.ind==index && opened==true)
+                                {
+                                  print('yay2');
+                                  parentProvider.toggleAlotDate("");
+                                  parentProvider.toggeCalendarShow(-1);
+                                  IndProvider.toggleInd(-1);
+                                  opened=false;
+                                } //close and turn off calendar
+                                else if(IndProvider.ind != index && parentProvider.calendar_show!=index)
+                                {
+                          loadingProvider.toggleFetching();
+                                  DocumentReference docRef = FirebaseFirestore.instance.collection('Doctors').doc(widget.id);
+                          
+                            try {
+                              // Get the document snapshot
+                              DocumentSnapshot docSnapshot = await docRef.get();
+                            loadingProvider.toggleFetching();
+                              // Check if the document exists
+                              if (docSnapshot.exists) {
+                                // Retrieve the 'Slots' field, which is expected to be a list of maps
+                                setState(() {
+                                  slots = docSnapshot['Slots'];
+                                });
+                                
+                                print(slots);
+                                if (slots != null) {
+                                  // Return the list of slots
+                                } else {
+                                  print("No slots found.");
+                                  return null; // No slots found
+                                }
+                              } else {
+                                print("Document does not exist.");
+                                return null; // Document does not exist
+                              }
+                            } catch (error) {
+                              // Handle any errors that occur
+                              print("Error retrieving slots: $error");
+                              return null; // Return null on error
+                            }
+                                  print(IndProvider.ind);
+                                  print(index);
+                                        print('yay3');
+                            parentProvider.toggleAlotDate("");
+                                  IndProvider.toggleInd(index);
+                            
+                                  opened=true;
+                                  Future.delayed(Duration(milliseconds: 300),(){
+                                  parentProvider.toggeCalendarShow(index);  
+                                  });
+                                  }//open and turn on calendar
+                          }
+                              },
+                              icon: parentProvider.calendar_show==index?Icon(Icons.arrow_upward_sharp,color: Colors.white,size: 20,): Icon(Icons.arrow_drop_down,color: Colors.white,size: 20,) // Down arrow icon
+                              ,label: Text('Select Slots',style: TextStyle(fontSize: 10, fontFamily: 'Font',color: Colors.white)), // Text label
+                            ),
+                          )
+                         
+                        
                         :TextButton(
                                 
                                 child: Text(doctor['Ban']==0? 'Ban': 'Unban',style: TextStyle(fontFamily: 'Font',color: Colors.white),),
                                 onPressed: ()
                                 async{
+                                  print('DOCTOR:');
+                                  print(doctor['Ban']);
+                                  print(widget.id);
                                   if (doctor['Ban']==0)
                                   {
 
                                   await FirebaseFirestore.instance
         .collection('Doctors') // Replace with your collection name
-        .doc(doctor['Email'])
+        .doc(widget.id)
         .update({'Ban': 1});
         if (search_list.length>0)
         {
@@ -633,7 +699,7 @@ _showAnimatedDialog(context);
                                   else{
                                     await FirebaseFirestore.instance
         .collection('Doctors') // Replace with your collection name
-        .doc(doctor['Email'])
+        .doc(widget.id)
         .update({'Ban': 0});
 
         if (search_list.length>0)
@@ -658,20 +724,20 @@ _showAnimatedDialog(context);
                       width:  width*0.6,
             
                       margin: EdgeInsets.fromLTRB(enlarged_width*0.03,enlarged_height* 0.20, 0,0),
-                      child: FittedBox(child: Text('Customer Reviews',style: TextStyle(fontFamily: 'Font',fontSize: 20,color: Colors.white,),))
+                      child: FittedBox(child: Text('Customer Reviews',style: TextStyle(fontFamily: 'Font',fontSize: 16,color: Colors.white,),))
             
                     ),
-                    if (parentProvider.show==true && IndProvider.ind ==index)
-                    AnimatedContainer(
-                      duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 200,microseconds:0),
-                      color: Colors.black,
-                      height: height*0.001,
-                      width:  width*0.75,
+                    // if (parentProvider.show==true && IndProvider.ind ==index)
+                    // AnimatedContainer(
+                    //   duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 200,microseconds:0),
+                    //   color: Colors.black,
+                    //   height: height*0.001,
+                    //   width:  width*0.75,
                       
-                      margin: EdgeInsets.fromLTRB(enlarged_width*0.03,enlarged_height* 0.35, 0,0),
-                      child: Text('',style: TextStyle(fontFamily: 'Font',fontSize: 20,color: Colors.white,),)
+                    //   margin: EdgeInsets.fromLTRB(enlarged_width*0.03,enlarged_height* 0.35, 0,0),
+                    //   child: Text('',style: TextStyle(fontFamily: 'Font',fontSize: 20,color: Colors.white,),)
             
-                    ),
+                    // ),
 
                      if (parentProvider.show==true && IndProvider.ind ==index)
 
@@ -779,7 +845,7 @@ _showAnimatedDialog(context);
               setState(() {
                 Slots = matchingSlots.map((slot) => slot['Time'] + '  Rs. '+slot['Price'] as String).toList();
               }); 
-              parentProvider.toggleAlotDate(selectedDate); _showCustomDialog(context);},
+              parentProvider.toggleAlotDate(selectedDate); _showCustomDialog(context,loadingProvider);},
               
             child:Text('${day.day}',
             style: TextStyle(color: Colors.white),

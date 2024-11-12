@@ -4,6 +4,16 @@ class ParentInfoContainer extends ChangeNotifier {
   
   var isUser = false;
   var isLoading = false;
+var to_ban = 0;
+
+var rev_loading = false;
+
+var fetching = false;
+
+var selected_slot_index=0;
+
+var time;
+
   var isSelected = false;
   var search_one = false;
   var show= false;
@@ -14,6 +24,31 @@ class ParentInfoContainer extends ChangeNotifier {
   var show_adder = false;
   var enlarged_adder = false;
   var alotDate = "";
+  void toggleRev_Loading()
+  {
+    rev_loading = !rev_loading;
+    notifyListeners();
+  }
+  void toggleTime(val)
+  {
+    time = val;
+    notifyListeners();
+  }
+  void toggleSelectedSlot(val)
+  {
+    selected_slot_index = val;
+    notifyListeners();
+  }
+  void toggleToBan(val)
+  {
+    to_ban = val;
+    notifyListeners();
+  }
+  void toggleFetching()
+  {
+    fetching = !fetching;
+    notifyListeners();
+  }
   void toggleAlotDate(val)
   {
     alotDate = val;

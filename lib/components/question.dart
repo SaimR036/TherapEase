@@ -5,9 +5,11 @@ import 'package:provider/provider.dart';
 class Questions extends StatefulWidget {
   late final questions;
   late int index;
+  late final dir;
   Questions({
     required this.questions,
     required this.index,
+    required this.dir,
   });
   @override
   State<Questions> createState() => _QuestionState();
@@ -18,7 +20,8 @@ class _QuestionState extends State<Questions> {
   late var questions;
   late int index;
   var choices =['Never', 'Sometimes','Often','Almost always'];
-  
+  var urdu_choices = ['کبھی نہیں','کبھی کبھی','اکثر','تقریباً ہمیشہ' ];
+  var dir;
   @override
   Widget build(BuildContext context) {
     var provider =  Provider.of<Indexes>(context);
@@ -26,46 +29,50 @@ class _QuestionState extends State<Questions> {
     final height = MediaQuery.of(context).size.height;
     questions = widget.questions;
     index = widget.index;
+    dir = widget.dir;
     return 
       Container(
+        height: height*0.70,
+        alignment: Alignment.topCenter,
         
-        alignment: Alignment.topLeft,
-        margin: EdgeInsets.fromLTRB(width*0.05,height*0.11,0,0),
         child: Column(
           children: [
           if(index==20)
            Column(
             children: [
               Container(
-                margin: EdgeInsets.fromLTRB(0,height*0.05,0,0),
+                margin: EdgeInsets.only(left: width*0.05,right: width*0.05),
                 alignment: Alignment.topLeft,
-                    child: Text('\u2022' +questions[20]+'\n',style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20,fontFamily: 'Font',color: Colors.white),),),
-           
+                    child: Text('\u2022' +questions[20],style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15,fontFamily: 'Font',color: Colors.white),),),
+        SizedBox(height: height*0.02,),
         Container(
           alignment: Alignment.topLeft,
-
-          height: height*0.03,
+          height: height*0.1,
           
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start, // Distribute space evenly
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Distribute space evenly
             children: [
               for (int i = 0; i < 4; i++)
           Container(
+            width: width*0.22,
+            height: height*0.05,
             decoration: BoxDecoration(
             color: provider.indexes[20] == i? Colors.green: Color(0xFF05696A) ,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.black,width: 2)
             ),
-            margin: EdgeInsets.only(right: width*0.02),
+            //margin: EdgeInsets.only(right: width*0.02),
             child: TextButton(
               onPressed: (){
                   provider.setIndexes(20, i);
 
               },
-              child:Text(
-              choices[i]+'\n'+'\n'+'\n'+'\n',
-              style: TextStyle(fontSize: 16, fontFamily: 'Font', color:  Colors.white),
-            )),
+              child:FittedBox(
+                child: Text(
+                choices[i],
+                style: TextStyle(fontSize: 14, fontFamily: 'Font', color:  Colors.white),
+                            ),
+              )),
           ),
             ],
           ),
@@ -83,35 +90,41 @@ class _QuestionState extends State<Questions> {
           Column(
             children: [
               Container(
-                margin: EdgeInsets.fromLTRB(0,height*0.05,0,0),
-                alignment: Alignment.topLeft,
-                    child: Text('\u2022' +questions[j]+'\n',style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20,fontFamily: 'Font',color: Colors.white),),),
-           
+                margin: EdgeInsets.only(left: width*0.05,right: width*0.05),
+                //margin: EdgeInsets.fromLTRB(0,height*0.05,0,0),
+                alignment: dir=='l'?Alignment.topLeft: Alignment.topRight,
+                    child: Text('\u2022' +questions[j],style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15,fontFamily: 'Font',color: Colors.white)
+                    ,textDirection: dir=='l'? TextDirection.ltr:TextDirection.rtl,),),
+        SizedBox(height: height*0.015,),
         Container(
           alignment: Alignment.topLeft,
 
-          height: height*0.03,
+          height: height*0.09,
           
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start, // Distribute space evenly
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Distribute space evenly
             children: [
-              for (int i = 0; i < 4; i++)
+              for (int i = dir=='l' ?0:3; dir=='l'?i < 4:i>=0; dir=='l'?i++:i--)
           Container(
+            width: width*0.22,
+            height: height*0.05,
             decoration: BoxDecoration(
             color: provider.indexes[j] == i? Colors.green: Color(0xFF05696A) ,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.black,width: 2)
             ),
-            margin: EdgeInsets.only(right: width*0.02),
+            //margin: EdgeInsets.only(right: width*0.02),
             child: TextButton(
               onPressed: (){
                   provider.setIndexes(j, i);
 
               },
-              child:Text(
-              choices[i]+'\n'+'\n'+'\n'+'\n',
-              style: TextStyle(fontSize: 16, fontFamily: 'Font', color:  Colors.white),
-            )),
+              child:FittedBox(
+                child: Text(
+                dir=='l'?choices[i]:urdu_choices[i],
+                style: TextStyle(fontSize: 14, fontFamily: 'Font', color:  Colors.white),
+                            ),
+              )),
           ),
             ],
           ),

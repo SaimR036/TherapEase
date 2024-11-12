@@ -18,12 +18,12 @@ class EnlargerProvider extends ChangeNotifier {
   int get indval => ind;
   void toggleAllDoctors(data)
   {
-    allDoctors = data.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    allDoctors = data;
     notifyListeners();
   }
   void toggleBanAllDoctors(ind,val)
   {
-    allDoctors[ind]['Ban'] = val;
+    allDoctors[ind]['data']['Ban'] = val;
     notifyListeners();
   }
 

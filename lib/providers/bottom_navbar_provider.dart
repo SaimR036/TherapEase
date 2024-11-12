@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 class BottomNavbarProvider extends ChangeNotifier {
-  int _selectedIndex=0;
+  var _selectedIndex=2;
 
   void toggleIndex(ind)
   {

@@ -2,6 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_application_1/components/bottom_navbar.dart';
+import 'package:flutter_application_1/views/users/Instructions.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Demographics extends StatefulWidget {
   const Demographics({super.key});
@@ -38,15 +42,17 @@ Color(0xFF29BDBD), // Second hex color (Red)
 Align(
   alignment: Alignment.topCenter,
   child: Container(
-    margin: EdgeInsets.fromLTRB(0, height*0.05, 0,0),
-    child: Text("Let's get to know you better",style: TextStyle(
-      fontSize: 26,
-      fontFamily: 'Font',color: Color(0xFF00FDFD)),),),
+    margin: EdgeInsets.fromLTRB(width*0.05, height*0.07, width*0.05,0),
+    child: FittedBox(
+      child: Text("Let's get to know you better",style: TextStyle(
+        fontSize: 22,
+        fontFamily: 'Font',color: Color(0xFF00FDFD)),),
+    ),),
 ),
 Container(
     margin: EdgeInsets.fromLTRB(width*0.05, height*0.26, 0,0),
     child: Text("Age range",style: TextStyle(
-      fontSize: 24,
+      fontSize: 20,
       fontFamily: 'Font',color: Colors.white),),),
 Container(
     margin: EdgeInsets.fromLTRB(width*0.60, height*0.16, 0,0),
@@ -67,7 +73,7 @@ Container(
         });
       },
       child:Text("Below 18",style: TextStyle(
-        fontSize: 24,
+        fontSize: 20,
         fontFamily: 'Font',color: Colors.white),),)),
 Container(
     margin: EdgeInsets.fromLTRB(width*0.61, height*0.23, 0,0),
@@ -88,7 +94,7 @@ Container(
         
       },
       child:Text("18 - 24",style: TextStyle(
-        fontSize: 24,
+        fontSize: 20,
         fontFamily: 'Font',color: Colors.white),),)),
 Container(
     margin: EdgeInsets.fromLTRB(width*0.61, height*0.30, 0,0),
@@ -109,7 +115,7 @@ Container(
         });
       },
       child:Text("25 - 40",style: TextStyle(
-        fontSize: 24,
+        fontSize: 20,
         fontFamily: 'Font',color: Colors.white),),)),
 Container(
     margin: EdgeInsets.fromLTRB(width*0.67, height*0.36, 0,0),
@@ -130,7 +136,7 @@ Container(
         });
       },
       child:Text("40+",style: TextStyle(
-        fontSize: 24,
+        fontSize: 20,
         fontFamily: 'Font',color: Colors.white),),)),
 
       Align(
@@ -139,17 +145,17 @@ Container(
         width: width*0.8,
         height: 2,
         color: Colors.white,
-        margin: EdgeInsets.fromLTRB(0,height*0.43,0,0),
+        margin: EdgeInsets.fromLTRB(0,height*0.42,0,0),
       )),
 
 
 Container(
-    margin: EdgeInsets.fromLTRB(width*0.05, height*0.51, 0,0),
+    margin: EdgeInsets.fromLTRB(width*0.05, height*0.48, 0,0),
     child: Text("Gender",style: TextStyle(
-      fontSize: 24,
+      fontSize: 20,
       fontFamily: 'Font',color: Colors.white),),),
 Container(
-    margin: EdgeInsets.fromLTRB(width*0.66, height*0.47, 0,0),
+    margin: EdgeInsets.fromLTRB(width*0.66, height*0.44, 0,0),
     child: TextButton(
       style: ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -168,10 +174,10 @@ Container(
       child:Text("Male",style: TextStyle(
         
         
-        fontSize: 24,
+        fontSize: 20,
         fontFamily: 'Font',color: Colors.white),),)),
 Container(
-    margin: EdgeInsets.fromLTRB(width*0.63, height*0.55, 0,0),
+    margin: EdgeInsets.fromLTRB(width*0.63, height*0.51, 0,0),
     child: TextButton(
       style: ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -189,7 +195,7 @@ Container(
         
       },
       child:Text("Female",style: TextStyle(
-        fontSize: 24,
+        fontSize: 20,
         fontFamily: 'Font',color: Colors.white),),)),
 
 Align(
@@ -198,16 +204,16 @@ Align(
         width: width*0.8,
         height: 2,
         color: Colors.white,
-        margin: EdgeInsets.fromLTRB(0,height*0.64,0,0),
+        margin: EdgeInsets.fromLTRB(0,height*0.60,0,0),
       )),
 Container(
-    margin: EdgeInsets.fromLTRB(width*0.05, height*0.76, 0,0),
+    margin: EdgeInsets.fromLTRB(width*0.05, height*0.7, 0,0),
     child: Text("Occupation",style: TextStyle(
-      fontSize: 24,
+      fontSize: 20,
       fontFamily: 'Font',color: Colors.white),),),
 
 Container(
-    margin: EdgeInsets.fromLTRB(width*0.62, height*0.68, 0,0),
+    margin: EdgeInsets.fromLTRB(width*0.62, height*0.64, 0,0),
     child: TextButton(
       style: ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -225,10 +231,10 @@ Container(
         });
       },
       child:Text("Working",style: TextStyle(
-        fontSize: 24,
+        fontSize: 20,
         fontFamily: 'Font',color: Colors.white),),)),
 Container(
-    margin: EdgeInsets.fromLTRB(width*0.62, height*0.76, 0,0),
+    margin: EdgeInsets.fromLTRB(width*0.62, height*0.7, 0,0),
     child: TextButton(
       style: ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -246,13 +252,13 @@ Container(
         });
       },
       child:Text("Student",style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
 
         fontFamily: 'Font',color: Colors.white),),)),
       
       Container(
-        width: width*0.45,
-    margin: EdgeInsets.fromLTRB(width*0.52, height*0.84, 0,0),
+        width: width*0.5,
+    margin: EdgeInsets.fromLTRB(width*0.49, height*0.76, 0,0),
     child: TextButton(
       style: ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -269,17 +275,19 @@ Container(
           occup_index = 2;
         });
       },
-      child:Text("None of these",style: TextStyle(
-              fontSize: 24,
-
-        fontFamily: 'Font',color: Colors.white),),)),
+      child:FittedBox(
+        child: Text("None of these",style: TextStyle(
+                fontSize: 20,
+        
+          fontFamily: 'Font',color: Colors.white),),
+      ),)),
         
         
         Align(
           alignment: Alignment.topCenter,
           child: Container(
           width: width*0.3,
-              margin: EdgeInsets.fromLTRB(0, height*0.92, 0,0),
+              margin: EdgeInsets.fromLTRB(0, height*0.85, 0,0),
               child: TextButton(
                 style: ButtonStyle(
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -350,16 +358,18 @@ Container(
           final user = FirebaseAuth.instance.currentUser;
 
           if (user != null) {
-            final email = user.email;
+            final uid = user.uid;
 
             // 2. Store age_idx in Firestore
-            await FirebaseFirestore.instance.collection('users').doc(email).set({
+            await FirebaseFirestore.instance.collection('users').doc(uid).set({
               'age_range': age,
               'gender':gender,
-              'occupation':occupation
+              'occupation':occupation,
+              'Info':'1'
+
             }, SetOptions(merge: true)); // Merge with existing data
-
-
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.setInt('isLoggedIn', 0);
             // 3. Optional: Show Success Snackbar
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -371,6 +381,13 @@ Container(
                 ),
               ),
             );
+               Navigator.pushReplacement( 
+        context,
+        PageTransition(
+      type: PageTransitionType.rightToLeft, // Or any other type
+      child: Instructions(),
+    ));
+
           } 
         } catch (e) {
           // 5. Error Handling

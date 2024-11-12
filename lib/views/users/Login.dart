@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/bottom_navbar.dart';
+import 'package:flutter_application_1/providers/bottom_navbar_provider.dart';
 import 'package:flutter_application_1/providers/login_provider.dart';
 import 'package:flutter_application_1/views/doctors/App_Status.dart';
+import 'package:flutter_application_1/views/users/demographics.dart';
 import 'package:flutter_application_1/views/users/home.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,6 +15,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+
 class Login extends StatefulWidget {
   const Login({super.key});
 
@@ -70,19 +76,43 @@ bool isPasswordStrong(String password) {
       });
     }
   }
+final FirebaseAuth _auth = FirebaseAuth.instance;
+final GoogleSignIn _googleSignIn = GoogleSignIn();
+late UserCredential user;
+Future<bool> signInWithGoogle() async {
+  try {
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    if (googleUser == null) {
+      return false; // User canceled the sign-in
+    }
 
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    user = await _auth.signInWithCredential(credential);
+    return true;
+  } catch (e) {
+    print("Error signing in with Google: $e");
+    return false;
+  }
+}
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseStorage storage = FirebaseStorage.instance;
   final _nameController = TextEditingController();
   var button_idx=0;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  var bottom_navbar_provider;
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     final loginProvider = Provider.of<LoginProvider>(context);
-
+    bottom_navbar_provider = Provider.of<BottomNavbarProvider>(context);
     return Scaffold(
       
       body:  Container(
@@ -335,8 +365,12 @@ child:SingleChildScrollView(
       height: height*0.05,
       duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 400,microseconds:0),),
     
-        Container(height: height*0.05, width:width*0.3,decoration:  BoxDecoration(color: Colors.transparent,borderRadius: BorderRadius.circular(10)), child: TextButton(
+        AnimatedContainer(
+                duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 400,microseconds:0),
+
+          height: height*0.05, width:width*0.3,decoration:  BoxDecoration(color: Colors.transparent,borderRadius: BorderRadius.circular(10)), child: TextButton(
           onPressed: (){
+            if(loginProvider.isTherapist)
             loginProvider.toggleIsTherapist();
             setState(() {
           button_idx=0;
@@ -345,7 +379,9 @@ child:SingleChildScrollView(
           setState(() {
             button_idx=1;
           });
-            loginProvider.toggleIsTherapist();
+          if(!loginProvider.isTherapist)
+          {
+            loginProvider.toggleIsTherapist();}
         }, child: FittedBox(child:Text('Therapist',style: TextStyle(color: Colors.white),))))
     ],),
   ),
@@ -363,6 +399,8 @@ child:SingleChildScrollView(
                       ),
                     ), 
                     onPressed: () async {
+                      loginProvider.toggleLoginLoader();
+
                       if (loginProvider.isLoginView) {
       String email = _emailController.text;
       String password = _passwordController.text;
@@ -375,7 +413,17 @@ child:SingleChildScrollView(
         );
         print(userCredential.user?.uid);
         // 2. Handle Successful Login
-        context.read<LoginProvider>().toggleUid(userCredential.user?.uid);      LoginProvider().toggleUid(userCredential.user?.uid);
+       
+        CollectionReference admins = FirebaseFirestore.instance.collection('Admin');
+
+  // Query for documents where 'email' field matches the provided email
+DocumentSnapshot adminSnapshot = await admins.doc(userCredential.user?.uid).get();
+if (adminSnapshot.exists) {
+   bottom_navbar_provider.toggleIndex(1);     
+
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setInt('isLoggedIn', 2);
+   loginProvider.toggleUid(userCredential.user?.uid);
         // Optional: Display a success message or navigate to another screen
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -385,54 +433,127 @@ child:SingleChildScrollView(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
           ),
         );
+   loginProvider.toggleUser(2);
+   Navigator.pushReplacement( 
+          context,
+          PageTransition(
+        type: PageTransitionType.rightToLeft, // Or any other type
+        child: BottomNavbar(),
+      ),
+        );
+  }
+  else{
+        if(!loginProvider.isTherapist)
+        {
           CollectionReference users = FirebaseFirestore.instance.collection('users');
 
   // Query for documents where 'email' field matches the provided email
 DocumentSnapshot userSnapshot = await users.doc(userCredential.user?.uid).get();
 
   if (userSnapshot.exists) {
-   Provider.of<LoginProvider>(context,listen: false).toggleUser(0);
+     loginProvider.toggleUid(userCredential.user?.uid);      
+        // Optional: Display a success message or navigate to another screen
+     
+   loginProvider.toggleUser(0);
+   if(userSnapshot['Info']=='0')
+    Navigator.pushReplacement( 
+          context,
+          PageTransition(
+        type: PageTransitionType.rightToLeft, // Or any other type
+        child: const Demographics(),
+      ),
+        );
+  else
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setInt('isLoggedIn', 0);
+   bottom_navbar_provider.toggleIndex(2);     
+
    Navigator.pushReplacement( 
           context,
           PageTransition(
         type: PageTransitionType.rightToLeft, // Or any other type
-        child: const BottomNavbar(),
+        child:  BottomNavbar(),
       ),
         );
+     ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Welcome Back!"), // Use display name if available
+            backgroundColor: Color(0xFF05696A),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          ),
+        );
   }
+  }
+  else{
+     ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Invalid email or password!"), // Use display name if available
+            backgroundColor: Color(0xFF05696A),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          ),
+        );
+  }
+        }
   else{
      CollectionReference doctors = FirebaseFirestore.instance.collection('Doctors');
 DocumentSnapshot docSnapshot = await doctors.doc(userCredential.user?.uid).get();
 
 if (docSnapshot.exists) {
+
+   loginProvider.toggleUid(userCredential.user?.uid);      
+   if (docSnapshot['Ban']==1)
+   {
+     ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Sorry, you have been banned!"), // Use display name if available
+            backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          ),
+        );
+   }
+   else{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setInt('isLoggedIn', 1);
+   bottom_navbar_provider.toggleIndex(2);     
+
+        // Optional: Display a success message or navigate to another screen
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Welcome Back!"), // Use display name if available
+            backgroundColor: Color(0xFF05696A),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          ),
+        );
   // Query for documents where 'email' field matches the provided email
-   Provider.of<LoginProvider>(context,listen: false).toggleUser(1);
+   loginProvider.toggleUser(1);
 Navigator.pushReplacement( 
           context,
           PageTransition(
         type: PageTransitionType.rightToLeft, // Or any other type
-        child: const BottomNavbar(),
+        child:  BottomNavbar(),
       ),
         );
+   }
   } 
-   
-  
   else{
-    CollectionReference admins = FirebaseFirestore.instance.collection('Admin');
-
-  // Query for documents where 'email' field matches the provided email
-DocumentSnapshot adminSnapshot = await admins.doc(userCredential.user?.uid).get();
-if (adminSnapshot.exists) {
-   Provider.of<LoginProvider>(context,listen: false).toggleUser(2);
-   Navigator.pushReplacement( 
-          context,
-          PageTransition(
-        type: PageTransitionType.rightToLeft, // Or any other type
-        child: const BottomNavbar(),
-      ),
+     ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Invalid email or password!"), // Use display name if available
+            backgroundColor: Color(0xFF05696A),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          ),
         );
   }
   }
+  
+    
+  
   }
         // If using navigation with named routes:
          
@@ -466,13 +587,13 @@ if (adminSnapshot.exists) {
         );
       }
       }
-                      else{   //login
+                      else{   //signup
                       if (loginProvider.isTherapist==false)
                       {
                       var email = _emailController.text;
                       var password = _passwordController.text;
                       var name = _nameController.text;
-CollectionReference users = FirebaseFirestore.instance.collection('Therapist_Applications');
+CollectionReference users = FirebaseFirestore.instance.collection('users');
 
   // Query for documents where 'email' field matches the provided email
   QuerySnapshot querySnapshot = await users.where('Email', isEqualTo: email.toLowerCase()).get();
@@ -512,18 +633,26 @@ CollectionReference users = FirebaseFirestore.instance.collection('Therapist_App
               password: password,
   
             );
-  
+     String profilePicName = 'profile_pics/$email.jpg'; // Use UID for the filename
+      UploadTask profileUploadTask = storage.ref(profilePicName).putFile(_profileImage!);
+      TaskSnapshot profileSnapshot = await profileUploadTask;
+      String profileImageUrl = await profileSnapshot.ref.getDownloadURL();
+
             await FirebaseFirestore.instance.collection('users').doc(userCredential.user?.uid).set({
               'uid': userCredential.user?.uid,
               'name': name,
-  
+              'ImageUrl': profileImageUrl,
+              'Appointments': [],
+              'Info':'0'
             });
-  
-            
+            loginProvider.toggleUid(userCredential.user?.uid);      
+        // Optional: Display a success message or navigate to another screen
+     
+   loginProvider.toggleUser(0);
             // Optional: Display a success message
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-      content: Text('Application submitted successfully',style: TextStyle(fontFamily: 'Font'),),
+      content: Text('Sign Up Successful',style: TextStyle(fontFamily: 'Font'),),
       backgroundColor: Color(0xFF05696A), // Dark green color
       behavior: SnackBarBehavior.floating, // Make it floating for rounded corners
       shape: RoundedRectangleBorder(       // Add rounded corners
@@ -531,6 +660,13 @@ CollectionReference users = FirebaseFirestore.instance.collection('Therapist_App
       ),
     ),
             );
+             Navigator.pushReplacement( 
+        context,
+        PageTransition(
+      type: PageTransitionType.rightToLeft, // Or any other type
+      child: Demographics(),
+    ));
+
           } on FirebaseAuthException catch (e) {
             String errorMessage = e.toString();
   if (errorMessage.contains(']')) {
@@ -570,7 +706,7 @@ CollectionReference users = FirebaseFirestore.instance.collection('Therapist_App
           }
                        }}
                       
-                       else{  //User sign up
+                       else{  //Therapist sign up
 var email; var password; var name;
 
                        
@@ -634,6 +770,7 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
   }
                       }
                       else{
+                        print('AHHHHHHHHHHHHHHHHHHHHHHH');
                         if (email.isEmpty  || name.isEmpty) {
   ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -664,21 +801,8 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
     return;
   }
 
-  if (!isPasswordStrong(password)) {
-     ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-      content: Text('Password must be 8 characters and should have uppercase,lowercase letters and one number',style: TextStyle(fontFamily: 'Font'),),
-      backgroundColor: Color(0xFF05696A), // Dark green color
-      behavior: SnackBarBehavior.floating, // Make it floating for rounded corners
-      shape: RoundedRectangleBorder(       // Add rounded corners
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-    ),
-            );
-    return;
-  }
   
-            
+
             String profilePicName = 'profile_pics/$email.jpg'; // Use UID for the filename
       UploadTask profileUploadTask = storage.ref(profilePicName).putFile(_profileImage!);
       TaskSnapshot profileSnapshot = await profileUploadTask;
@@ -689,19 +813,19 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
       UploadTask resumeUploadTask = storage.ref(resumeName).putFile(_resumeFile!);
       TaskSnapshot resumeSnapshot = await resumeUploadTask;
       String resumeUrl = await resumeSnapshot.ref.getDownloadURL();
-
       await firestore.collection('Therapist_Applications').add({
     'Email': email,
     'Name': name,
-    'Password':password,
-    'ProfileUrl':profileImageUrl,
-    'ResumeUrl':resumeUrl
+    'ImageUrl':profileImageUrl,
+    'ResumeUrl':resumeUrl,
+    'Status':"1",
+    'createdAt':FieldValue.serverTimestamp(),
   });
             
             // Optional: Display a success message
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-      content: Text('Sign Up Successful',style: TextStyle(fontFamily: 'Font'),),
+      content: Text('Application submitted successfully',style: TextStyle(fontFamily: 'Font'),),
       backgroundColor: Color(0xFF05696A), // Dark green color
       behavior: SnackBarBehavior.floating, // Make it floating for rounded corners
       shape: RoundedRectangleBorder(       // Add rounded corners
@@ -759,13 +883,18 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
                        
                         }//sign up end
 
+                      loginProvider.toggleLoginLoader();
 
         },
   
   
                     
                     child:  FittedBox(
-                      child: Text(
+                      child:loginProvider.loginLoader? Center(child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(color: Colors.black,),
+                      )):
+                      Text(
                         loginProvider.isLoginView?'Log In':loginProvider.isTherapist? 'Submit Application':'Sign Up',
                         style: TextStyle(
                           color: Colors.black,
@@ -776,6 +905,7 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
                     ),
                   ),
               ),
+  if(!loginProvider.isTherapist)
   Container(
                  alignment: Alignment.topCenter,
   
@@ -788,46 +918,95 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
       
-    //         Container(
-    //   width: width * 0.08,
-    //   height: height * 0.06,
-    //   decoration: BoxDecoration(
-    //     color: Colors.black,
-    //     shape: BoxShape.circle,
-    //   ),
-    //   margin: EdgeInsets.fromLTRB(0,0, 0, 0),
-    //   child: IconButton(
-    //     padding: EdgeInsets.zero,
-    //     iconSize: 20,
-    //     onPressed: () {},
-    //     icon: ClipOval( // Clip the Image to be oval/circular
-    //       child: Image.asset(
-    //         'lib/assets/google_logo.webp',
-    //         fit: BoxFit.cover,
-    //       ),
-    //     ),
-    //   ),
-    //  ),
-     
+  
+     if(!loginProvider.isTherapist)
                 Container(
-                  width: width*0.08,
-                  height: height*0.06,    
-     decoration: BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-      ),              margin: EdgeInsets.fromLTRB(0,0, 0, 0),
-                  child:IconButton(
-        padding: EdgeInsets.zero,
-        iconSize: 30,
-        onPressed: () {},
-        icon: ClipOval( // Clip the Image to be oval/circular
-          child: Image.asset(
-            'lib/assets/google_logo.webp',
-            fit: BoxFit.cover,
-          ),
-        ),
+                  width: width * 0.08,
+                  height: height * 0.06,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    iconSize: 30,
+                    onPressed: () async{
+                  loginProvider.toggleLoginLoader();
+
+                  await _googleSignIn.signOut();
+                  if(await signInWithGoogle())
+                  {
+                    var userRef = FirebaseFirestore.instance.collection('users').doc(user.user?.uid);
+                    var docSnapshot = await userRef.get();
+                    if (docSnapshot.exists) {
+                      loginProvider.toggleUid(user.user?.uid);      
+        // Optional: Display a success message or navigate to another screen
+     
+   loginProvider.toggleUser(0);
+   SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setInt('isLoggedIn', 0);
+                      if(docSnapshot['Info']=='0')
+    Navigator.pushReplacement( 
+          context,
+          PageTransition(
+        type: PageTransitionType.rightToLeft, // Or any other type
+        child: const Demographics(),
       ),
+        );
+  else
+  {
+    
+   Navigator.pushReplacement( 
+          context,
+          PageTransition(
+        type: PageTransitionType.rightToLeft, // Or any other type
+        child:  BottomNavbar(),
+      ),
+        );
+     ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Welcome Back!"), // Use display name if available
+            backgroundColor: Color(0xFF05696A),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          ),
+        );
+  }
+                    } else {
+await FirebaseFirestore.instance.collection('users').doc(user.user?.uid).set({
+              'uid': user.user?.uid,
+              'name': user.user?.displayName,
+              'ImageUrl': user.user?.photoURL,
+              'Appointments': [],
+              'Info':'0'
+            });
+  loginProvider.toggleUid(user.user?.uid);      
+        // Optional: Display a success message or navigate to another screen
+     
+   loginProvider.toggleUser(0);
+            Navigator.pushReplacement( 
+          context,
+          PageTransition(
+        type: PageTransitionType.rightToLeft, // Or any other type
+        child: const Demographics(),
+      ),
+        );
+
+                  }
+                  }
+                                        loginProvider.toggleLoginLoader();
+
+                    },
+                    icon: ClipOval(
+                      child: Image.asset(
+                        'lib/assets/google_logo.webp',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
                 ),
+
     //             Container(
     //               width: width*0.08,
     //               height: height*0.06,    

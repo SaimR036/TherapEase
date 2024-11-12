@@ -1,5 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_1/providers/login_provider.dart';
+import 'package:flutter_application_1/views/users/Login.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PaymentApprovalPage extends StatefulWidget {
   @override
@@ -17,8 +24,8 @@ class _PaymentApprovalPageState extends State<PaymentApprovalPage> {
         isLoading = true;
       });
 
-      DocumentReference doctorRef = FirebaseFirestore.instance.collection('Doctors').doc('0udrDWeB2NTRglYz1E4htrucTkk2');
-      DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc('0udrDWeB2NTRglYz1E4htrucTkk2');
+      DocumentReference doctorRef = FirebaseFirestore.instance.collection('Doctors').doc(paymentDoc['DocId']);
+      DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(paymentDoc['Uid']);
       DocumentSnapshot docSnapshot = await doctorRef.get();
 
       // Loop through each payment document
@@ -31,7 +38,8 @@ class _PaymentApprovalPageState extends State<PaymentApprovalPage> {
       String profession = paymentDoc['Profession'];
       String imageUrl = paymentDoc['ImageUrl']; // Assuming you have an ImageUrl field
       var slots = docSnapshot['Slots'];
-
+      String Uid = paymentDoc['Uid'];
+      String DocId = paymentDoc['DocId'];
       // Appointment maps
       Map<String, String> doctorAppointment = {
         'Pname': pname,
@@ -39,6 +47,7 @@ class _PaymentApprovalPageState extends State<PaymentApprovalPage> {
         'Time': time,
         'Link': link,
         'Price': price,
+        'Uid': Uid
       };
 
       Map<String, String> userAppointment = {
@@ -48,6 +57,8 @@ class _PaymentApprovalPageState extends State<PaymentApprovalPage> {
         'Link': link,
         'Price': price,
         'Profession': profession,
+        'IsReviewed':'0',
+        'DocId':DocId
       };
 
       // If approved, update doctor's and user's appointments
@@ -120,6 +131,8 @@ class _PaymentApprovalPageState extends State<PaymentApprovalPage> {
 
   @override
   Widget build(BuildContext context) {
+      var provider = Provider.of<LoginProvider>(context);
+
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -141,17 +154,40 @@ class _PaymentApprovalPageState extends State<PaymentApprovalPage> {
             alignment: Alignment.topCenter,
             margin: EdgeInsets.only(top: height*0.1),
             child:Text("Payment Approval",style: TextStyle(fontSize: 40,color: Colors.white),)),
+           Center(child: Container(
+                  width: width*0.4,
+                  decoration: BoxDecoration(
+                      color: Color(0xFF05696A),
+                      borderRadius: BorderRadius.circular(10),
 
+                  ),
+                  child: Center(
+                    child: TextButton(onPressed: ()
+                    async{
+                      await GoogleSignIn().signOut();
+                      await FirebaseAuth.instance.signOut();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setInt('isLoggedIn', -1);
+                        provider.toggleUid('0');
+                         Navigator.pushReplacement( 
+                            context,
+                            PageTransition(
+                          type: PageTransitionType.leftToRight, // Or any other type
+                          child: Login(),
+                        ));
+                    }, child: FittedBox(child: Text('Logout',style: TextStyle(color: Colors.white,fontSize: 20),))),
+                  ),
+                ),),
           Container(
             width: width*0.9,
-            height: height*0.8,
+            height: height*0.65,
             child: FutureBuilder<QuerySnapshot>(
             future: FirebaseFirestore.instance
                 .collection('Payment_Screenshots')
                 .get(), // Fetch all payments
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator(color: Colors.white,));
               }
               if (snapshot.hasError) {
                 return Center(child: Text("Error fetching payment details"));

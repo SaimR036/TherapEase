@@ -36,6 +36,8 @@ class _Therapists_HomeState extends State<Therapists_Home> {
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
+    var uid = Provider.of<LoginProvider>(context).uid;
+
     return Scaffold(
       body: Container(
           height: height,
@@ -84,18 +86,24 @@ class _Therapists_HomeState extends State<Therapists_Home> {
                       color: Color(0xFF17A2A3),
                       borderRadius: BorderRadius.circular(10)),
                     child: StreamBuilder( //
-                    stream: FirebaseFirestore.instance.collection('Doctors').doc('0udrDWeB2NTRglYz1E4htrucTkk2').snapshots(),
+                    stream: FirebaseFirestore.instance.collection('Doctors').doc(uid).snapshots(),
                     builder: (context,  snapshot) {
                                       
-                      if (!snapshot.hasData) {
-                        return Container(
-                          width: width*0.1,
-                          height: height*0.1,
-                          margin: EdgeInsets.fromLTRB(0,height*0.1,0,0),
-                          child: CircularProgressIndicator(color: Colors.white,));
-                      }
+                     if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: Colors.white));
+          }
+
+          if (snapshot.hasError || !snapshot.hasData) {
+            return const Center(child: Text('No Reviews yet'));
+          }
                       var details = snapshot.data!.data() as Map<String, dynamic>;
                       var reviews = details['Reviews'];
+                        if (reviews.isEmpty) {
+                      return const Center(
+                        child: Text('No Reviews Yet', style: TextStyle(color: Colors.white, fontSize: 20)),
+                      );
+                    }
+
                       return Container(
                         margin: EdgeInsets.fromLTRB(width*0.025, height*0.01,0,0),
                          width: width*0.85,
@@ -113,7 +121,7 @@ class _Therapists_HomeState extends State<Therapists_Home> {
                               decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),
                             color: Color(0xFF05696A)
                             ),
-                            width: width*0.45,
+                            width: width*0.5,
                             height: height*0.17,
                             child:Column(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -121,7 +129,7 @@ class _Therapists_HomeState extends State<Therapists_Home> {
                                 Row(children: [
                                   Container(
                                     width: width*0.27,
-                                    child: Text(review['Pname'],style: TextStyle(fontSize: 16,color: Colors.white),),),
+                                    child: FittedBox(child: Text(review['Pname'],style: TextStyle(fontSize: 16,color: Colors.white),)),),
                                   SizedBox(width: width*0.07, height: height*0.03,),
                                   Container(child: Text( review['Rating'].toString(),style: TextStyle(color: Colors.white),),)
                                 ,Container(
@@ -158,18 +166,23 @@ class _Therapists_HomeState extends State<Therapists_Home> {
                     height: height*0.4,
                     margin: EdgeInsets.only(left: width*0.05),
                     child: StreamBuilder( //
-                        stream: FirebaseFirestore.instance.collection('Doctors').doc('0udrDWeB2NTRglYz1E4htrucTkk2').snapshots(),
+                        stream: FirebaseFirestore.instance.collection('Doctors').doc(uid).snapshots(),
                         builder: (context,  snapshot) {
-                    
-                          if (!snapshot.hasData) {
-                            return Container(
-                              width: width*0.1,
-                              height: height*0.1,
-                              margin: EdgeInsets.fromLTRB(0,height*0.1,0,0),
-                              child: CircularProgressIndicator(color: Colors.white,));
-                          }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: Colors.white));
+          }
+
+          if (snapshot.hasError || !snapshot.hasData) {
+            return const Center(child: Text('No Upcoming Appointments'));
+          }
                           var details = snapshot.data!.data() as Map<String, dynamic>;
                           var appointments = details['Appointments'];
+                            if (appointments.isEmpty) {
+                      return const Center(
+                        child: Text('No Sessions Yet', style: TextStyle(color: Colors.white, fontSize: 20)),
+                      );
+                    }
+
                           return Container(
                             child: ListView.builder(
                               itemCount: appointments.length,

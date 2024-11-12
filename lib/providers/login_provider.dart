@@ -5,11 +5,16 @@ class LoginProvider extends ChangeNotifier {
   bool isTherapist = false;
   var user=0;
   var uid;
+  var loginLoader= false;
   void toggleIsTherapist() {
     isTherapist = !isTherapist; 
     notifyListeners();        // Notify widgets to rebuild
   }
-
+  void toggleLoginLoader()
+  {
+    loginLoader = !loginLoader;
+    notifyListeners();
+  }
   void toggleUser(user1)
   {
     user = user1;

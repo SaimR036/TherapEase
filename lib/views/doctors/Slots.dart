@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/bottom_navbar.dart';
+import 'package:flutter_application_1/providers/login_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:googleapis/calendar/v3.dart' as cal;
@@ -126,15 +128,13 @@ var _priceController = TextEditingController();
       // Define the slot to add
       Map<String, String> slot = {
         'Date': finaltime.split(';')[0],
-        'Time': finaltime.split(';')[1],
+        'Time': finaltime.split(';')[1].substring(1,),
         'Booked':'0',
         'Link':link,
         'Price':price
       };
 
-      // Reference to the Firebase document (you can adjust the path to match your structure)
-      var doctorId = '0udrDWeB2NTRglYz1E4htrucTkk2'; // Replace with dynamic ID if needed
-      var docRef = FirebaseFirestore.instance.collection('Doctors').doc(doctorId);
+      var docRef = FirebaseFirestore.instance.collection('Doctors').doc(uid);
 
       // Add the slot to the 'Slots' array in Firebase
        try {
@@ -209,15 +209,15 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
         title: slot!=null?Text('Delete Slot?',style: TextStyle(color: Colors.black),):Text('Slot Confirmation',style: TextStyle(color: Color(0xFF05696A)),),
         content: Container(
           height:  slot!=null? null:height*0.17,
-          child: slot!=null?Text(slot['Date']+';'+slot['Time'],style: TextStyle(color: Colors.red,fontSize: 20,fontWeight: FontWeight.bold)):
+          child: slot!=null?Container(child: FittedBox(child: Text(slot['Date']+';'+slot['Time'],style: TextStyle(color: Colors.red,fontSize: 20,fontWeight: FontWeight.bold)))):
           Column(children: [
-          Text(finaltime,style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold)),
+          Container(child: Text(finaltime,style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold))),
           Row(children: [
-            Text('Price',style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold)),
+            Container(child: Text('Price',style: TextStyle(color: Color(0xFF05696A),fontSize: 20,fontWeight: FontWeight.bold))),
             //TextField here
           SizedBox(width: 16.0),
                             Container(
-                              height: height*0.1,
+                              //height: height*0.1,
                               width: width*0.5,
                               child: TextField(
                                 controller: _priceController,
@@ -241,12 +241,11 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
           ]),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Cancel',style: TextStyle(color: Color(0xFF05696A)))),
+         Row(children: [ TextButton(onPressed: () => Navigator.of(context).pop(), child: FittedBox(child: Text('Cancel',style: TextStyle(color: Color(0xFF05696A))))),
           TextButton(onPressed: ()async{
         if (slot==null)
         {
-          String link = await GetMeetLink();
-          if(_priceController.text.isEmpty)
+            if(_priceController.text.isEmpty)
           {
                ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -258,7 +257,9 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
       );
       return;
           }
-          else if (link=='')
+          String link = await GetMeetLink();
+          print(link);
+          if (link=='')
           {
             ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -277,7 +278,7 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
           }
         else
         {
-             var docRef = FirebaseFirestore.instance.collection('Doctors').doc('0udrDWeB2NTRglYz1E4htrucTkk2');
+             var docRef = FirebaseFirestore.instance.collection('Doctors').doc(uid);
                                   await docRef.update({
         'Slots': FieldValue.arrayRemove([slot])
       });
@@ -295,9 +296,10 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
         }
         Navigator.of(context).pop();
           }
-          , child: slot!=null? Text('Delete',style: TextStyle(color: Color(0xFF05696A))):Text('Generate Link and add Slot',style: TextStyle(color: Color(0xFF05696A)))),
+          , child: slot!=null? Text('Delete',style: TextStyle(color: Color(0xFF05696A))):FittedBox(child: Text('Generate Link and add Slot',style: TextStyle(color: Color(0xFF05696A))))),
         ],
       ),
+        ])
     );
   },
   
@@ -342,6 +344,7 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
             colorScheme: ColorScheme.light(primary: Color(0xFF05696A)), // Set color scheme
             buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.normal), // Make button text primary
           ), child:TimePickerDialog( // Embedding the TimePickerDialog
+              initialEntryMode: TimePickerEntryMode.inputOnly,
               initialTime: TimeOfDay.now(),
             )),
         ),
@@ -349,6 +352,7 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
     },
   ).then((pickedTime) {
     if (pickedTime != null && pickedTime is TimeOfDay) {
+      
       setState(() {
         _selectedTime = pickedTime;
         // Update the display string with both date and time
@@ -362,10 +366,12 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
   );
 }
   var enlarge=false;
+  var uid;
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
+    uid = Provider.of<LoginProvider>(context).uid;
 
     return Scaffold(
       //bottomNavigationBar: BottomNavbar(),
@@ -389,6 +395,7 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
             children: [
               Container(
                 alignment: Alignment.topCenter,
+                margin: EdgeInsets.only(top: height*0.07),
                 child: FittedBox(child: Text('Slots',style: TextStyle(color: Colors.white, fontSize: 40),),)),
                SizedBox(height: height*0.03,),
               AnimatedContainer(
@@ -488,25 +495,30 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
               margin: EdgeInsets.only(left: width*0.075),
                 alignment: Alignment.topLeft,
                 width: width*0.4,
-                height: height*0.1, 
                 child: FittedBox(child: Text('Slots Details',style: TextStyle(color: Colors.white,fontSize: 30),)),),
                Container(
                   width: width*0.85,
                   height: height*0.5,
                   margin: EdgeInsets.only(left: width*0.075),
                   child: StreamBuilder( //
-                      stream: FirebaseFirestore.instance.collection('Doctors').doc('0udrDWeB2NTRglYz1E4htrucTkk2').snapshots(),
+                      stream: FirebaseFirestore.instance.collection('Doctors').doc(uid).snapshots(),
                       builder: (context,  snapshot) {
                   
-                        if (!snapshot.hasData) {
-                          return Container(
-                            width: width*0.1,
-                            
-                            margin: EdgeInsets.fromLTRB(0,height*0.1,0,0),
-                            child: CircularProgressIndicator(color: Colors.white,));
-                        }
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: Colors.white));
+          }
+
+          if (snapshot.hasError || !snapshot.hasData) {
+            return const Center(child: Text('No Slots added'));
+          }
                         var details = snapshot.data!.data() as Map<String, dynamic>;
                         List<dynamic> Slots = details['Slots'];
+                          if (Slots.isEmpty) {
+                      return const Center(
+                        child: Text('No Slots Added Yet', style: TextStyle(color: Colors.white, fontSize: 20)),
+                      );
+                    }
+
                         return Container(
                           
                           child: ListView.builder(
@@ -530,9 +542,9 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
                                   children: [
                                 Container(
                                 margin: EdgeInsets.only(left: width*0.02),
-                                width: width*0.5,
+                                width: width*0.50,
                                 height: height*0.05,
-                                child: Text(Slot['Date'],style: TextStyle(color: Colors.white,fontSize: 18),)),
+                                child:FittedBox(child: Text(Slot['Date'],style: TextStyle(color: Colors.white,fontSize: 18),))),
                                 SizedBox(width: width*0.07,),
                                 Container(
                                   

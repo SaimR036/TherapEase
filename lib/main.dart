@@ -1,4 +1,5 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_application_1/components/bottom_navbar.dart';
@@ -15,6 +16,7 @@ import 'package:flutter_application_1/views/doctors/Bank_Details.dart';
 import 'package:flutter_application_1/views/doctors/Reviews.dart';
 import 'package:flutter_application_1/views/doctors/Slots.dart';
 import 'package:flutter_application_1/views/doctors/Therapists_Home.dart';
+import 'package:flutter_application_1/views/users/profile.dart';
 import 'package:flutter_application_1/views/users/set_meet.dart';
 import 'package:flutter_application_1/views/admin/Admin_panel.dart';
 import 'package:flutter_application_1/views/users/Instructions.dart';
@@ -25,7 +27,8 @@ import 'package:flutter_application_1/views/users/home.dart';
 import 'package:flutter_application_1/views/users/questionnaire.dart';
 import 'package:flutter_application_1/views/users/test1.dart';
 import 'dart:async';
-import 'package:page_transition/page_transition.dart'; 
+import 'package:page_transition/page_transition.dart';
+import 'package:shared_preferences/shared_preferences.dart'; 
 import 'firebase_options.dart';  
 import 'package:provider/provider.dart';
 import './providers/login_provider.dart';
@@ -80,15 +83,9 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
       duration: const Duration(milliseconds: 1600), // 3-second animation duration
       vsync: this, // For smooth animations
     );
-    Timer(const Duration(seconds: 1), () {
-      Navigator.pushReplacement( 
-        context,
-        PageTransition(
-      type: PageTransitionType.rightToLeft, // Or any other type
-      child:  PaymentApprovalPage(),
-    ),
-      );
-    });
+      _checkLoginStatus();
+
+    
   
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
     _animationController.forward(); // Start the animation
@@ -99,12 +96,46 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
     _animationController.dispose(); // Clean up the animation controller
     super.dispose();
   }
+   Future<void> _checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? isLoggedIn = prefs.getInt('isLoggedIn');
+    if(isLoggedIn==null)
+    {
+      Timer(const Duration(seconds: 3), () {
+      Navigator.pushReplacement( 
+        context,
+        PageTransition(
+      type: PageTransitionType.rightToLeft, // Or any other type
+      child:Login()
+    ),
+      );
+    });
+    }
+    else{   
+    // Check Firebase authentication as well
+    User? user = FirebaseAuth.instance.currentUser;
+    final navbarProvider = Provider.of<LoginProvider>(context, listen: false);
+    navbarProvider.toggleUid(user?.uid);
+    navbarProvider.toggleUser(isLoggedIn); // Set the initial index
+
+    print(user);
+    Timer(const Duration(seconds: 3), () {
+      Navigator.pushReplacement( 
+        context,
+        PageTransition(
+      type: PageTransitionType.rightToLeft, // Or any other type
+      child:  BottomNavbar()
+    ),
+      );
+    });
+  }
+   }
+
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-    var _selectedIndex=0;
     return Scaffold(
     
       body: Stack(

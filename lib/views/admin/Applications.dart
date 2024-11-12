@@ -67,8 +67,9 @@ class _TherapistApplicationsPageState extends State<TherapistApplicationsPage> {
           child: Column(
             children: [
               Container(
+                width: width*0.75,
                 margin: EdgeInsets.only(top: height*0.05,bottom: height*0.03),
-                child: Text("Therapists' Applications",style: TextStyle(color: Colors.white,fontSize: 40),),),
+                child: FittedBox(child: Text("Therapists' Applications",style: TextStyle(color: Colors.white,fontSize: 40),)),),
             Container(
               width: width*0.95,
               height: height,
@@ -76,7 +77,7 @@ class _TherapistApplicationsPageState extends State<TherapistApplicationsPage> {
               future: _fetchApplications(provider),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return Center(child: CircularProgressIndicator(color: Colors.white,));
                 }
                       
                 if (snapshot.hasError) {
@@ -90,7 +91,15 @@ class _TherapistApplicationsPageState extends State<TherapistApplicationsPage> {
                 final applications = snapshot.data!.where((app) => app['Status'] != "2" && app['Status']!="0")
         .toList();
       
-                      
+                      if (applications.isEmpty) {
+  return Container(
+    alignment: Alignment.topCenter,
+    child: Text(
+      'No applications',
+      style: TextStyle(color: Colors.white, fontSize: 20),
+    ),
+  );
+}
                 return ListView.builder(
                   itemCount: applications.length,
                   itemBuilder: (context, index) {
@@ -108,11 +117,12 @@ class _TherapistApplicationsPageState extends State<TherapistApplicationsPage> {
                       children: [
                       
                       Column(children: [
-                        if (application['ProfileUrl'] != null)
+                        if (application['ImageUrl'] != null)
                                 Container(
+                                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
                                   height: 100,
                                   width: 100,
-                                  child: Image.network(application['ProfileUrl'].toString(), height: 100, fit: BoxFit.cover)),
+                                  child: Image.network(application['ImageUrl'].toString(), fit: BoxFit.cover)),
                               // Display the resume link as a button
                       Text(application['Name'] ?? 'No Name',style: TextStyle(color: Colors.white),),
                       Container(
@@ -120,67 +130,85 @@ class _TherapistApplicationsPageState extends State<TherapistApplicationsPage> {
                         child: Text('Email: ${application['Email'] ?? 'No Email'}',style: TextStyle(color: Colors.white))),
 
                       ],),
+                      SizedBox(width: width*0.1,),
                       Column(children: [
 
-                          ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF05696A), // Set button color
-                        ),
-                                onPressed: () async{
-                                  await _firestore.collection('Therapist_Applications').doc(application['id']).update({
-      'Status': "0", // Set status to 2 (approved)
-    });
-    provider.setStatus(index,"0");
-     ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Approved"), // Use display name if available
-            backgroundColor: Color(0xFF05696A),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-          ),
-        );
-                                },
-                                
-                                child: Text('Disapprove',style: TextStyle(color: Colors.white),),
-                              ),
-                      SizedBox(height: height*0.02,),
-                       if (application['ResumeUrl'] != null)
-                                ElevatedButton(
+                          Container(
+                            width: width*0.3,
+                            child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF05696A), // Set button color
-                        ),
-                                  onPressed: () {
-                                    // Open the resume PDF in a webview or similar
-                                    _openResume(application['ResumeUrl']);
+                            backgroundColor: Color(0xFF05696A), // Set button color
+                                                    ),
+                                  onPressed: () async{
+                                    await _firestore.collection('Therapist_Applications').doc(application['id']).update({
+                                  'Status': "0", // Set status to 2 (approved)
+                                });
+                                provider.setStatus(index,"0");
+                                                 ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text("Disapproved"), // Use display name if available
+                                    backgroundColor: Colors.blueGrey,
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                                  ),
+                                );
+                                applications.removeWhere((app) => app['id'] == application['id']);
                                   },
-                                  child: Text('View Resume',style: TextStyle(color: Colors.white),),
+                                  
+                                  child: FittedBox(child: Text('Disapprove',style: TextStyle(color: Colors.white),)),
+                                ),
+                          ),
+                      SizedBox(height: height*0.01,),
+                         Container(
+                           width: width*0.3,
+
+                           child: ElevatedButton(
+                               style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Color(0xFF05696A), // Set button color
+                                                ),
+                               onPressed: () async{
+                                
+                                                 await _firestore.collection('Therapist_Applications').doc(application['id']).update({
+                              'Status': "2", // Set status to 2 (approved)
+                            });
+
+                            provider.setStatus(index,"2");
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text("Approved"), // Use display name if available
+                                        backgroundColor: Color(0xFF05696A),
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                                      ),
+                                    );
+
+                                applications.removeWhere((app) => app['id'] == application['id']);
+
+                               },
+                               child: FittedBox(child: Text('Approve',style: TextStyle(color: Colors.white),)),
+                             ),
+                         ),
+                        SizedBox(height: height*0.01,),
+
+                       if (application['ResumeUrl'] != null)
+                                Container(
+                                  width: width*0.3,
+
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                                            backgroundColor: Color(0xFF05696A), // Set button color
+                                                          ),
+                                    onPressed: () {
+                                      // Open the resume PDF in a webview or similar
+                                      _openResume(application['ResumeUrl']);
+                                    },
+                                    child: FittedBox(child: Text('View Resume',style: TextStyle(color: Colors.white),)),
+                                  ),
                                 ),
 
-                      ],),
-                      SizedBox(width: width*0.04,),
-                      Column(children: [
-                         ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF05696A), // Set button color
-                        ),
-                                onPressed: () async{
-await _firestore.collection('Therapist_Applications').doc(application['id']).update({
-      'Status': "2", // Set status to 2 (approved)
-    });
-    provider.setStatus(index,"2");
- ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Disapproved"), // Use display name if available
-            backgroundColor: Colors.blueGrey,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-          ),
-        );
-                                },
-                                child: Text('Approve',style: TextStyle(color: Colors.white),),
-                              ),
-                      ],)
-
+                     
+                   
+ ],),
                      ],),
                    
                         

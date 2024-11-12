@@ -66,11 +66,17 @@ Container(
 CollectionReference users = FirebaseFirestore.instance.collection('Therapist_Applications');
 
   // Query for documents where 'email' field matches the provided email
-  QuerySnapshot querySnapshot = await users.where('Email', isEqualTo: email.text.toLowerCase()).get();
-
+QuerySnapshot querySnapshot = await users
+    .where('Email', isEqualTo: email.text.toLowerCase())
+    //.orderBy('createdAt', descending: true) // Make sure 'createdAt' is a field in your documents
+    .limit(1)
+    .get();
   if (querySnapshot.docs.isNotEmpty) {
-    DocumentSnapshot doc = querySnapshot.docs.first;
-
+    DocumentSnapshot doc1 = querySnapshot.docs.first;
+    Map<String, dynamic> doc = {
+    ...doc1.data() as Map<String, dynamic>,
+    'id': doc1.id, // Append document ID as 'id'
+  };
     // Access the 'Name' field of the document
     String status = doc['Status'];
     if (status=='1')
@@ -133,7 +139,7 @@ CollectionReference users = FirebaseFirestore.instance.collection('Therapist_App
   else{
       ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-      content: Text('No Application Submitted',style: TextStyle(fontFamily: 'Font'),),
+      content: Text('No Current Applications',style: TextStyle(fontFamily: 'Font'),),
       backgroundColor: Colors.blueGrey, // Dark green color
       behavior: SnackBarBehavior.floating, // Make it floating for rounded corners
       shape: RoundedRectangleBorder(       // Add rounded corners

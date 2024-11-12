@@ -260,7 +260,7 @@ Container(
           'Appointments': [], // Initialize empty array
           'Slots': [], // Initialize empty array
           'Email': details['Email'],
-          'ProfileUrl':details['ProfileUrl'],
+          'ImageUrl':details['ImageUrl'],
           'Name': details['Name']
         });
         await FirebaseFirestore.instance
