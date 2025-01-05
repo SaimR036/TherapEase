@@ -113,6 +113,29 @@ class _ProfileState extends State<Profile> {
                       style: const TextStyle(fontSize: 30, fontStyle: FontStyle.italic,color: Colors.white),
                     ),
                   ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                 if (!isUser)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      profileData['Rating'] ?? 'No Rating',
+                      style: const TextStyle(fontSize: 30, fontStyle: FontStyle.italic,color: Colors.white),
+                    ),
+                  ),
+                  if (!isUser)
+                  AnimatedContainer(
+                        alignment: Alignment.center,
+                          duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 700,microseconds:0),
+                        
+                                    //alignment: Alignment.topRight,
+                                    width: width*0.1,
+                                    
+                                    child: Icon(Icons.star,color: Colors.white,)),
+
+
+                  ]),
                 Center(child: Container(
                   width: width*0.4,
                   decoration: BoxDecoration(

@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/parent_info.dart';
-import 'package:flutter_application_1/providers/parent_info_container.dart';
 import 'package:provider/provider.dart';
 class Therapists extends StatefulWidget {
   const Therapists({super.key});

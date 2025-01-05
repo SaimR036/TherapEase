@@ -64,7 +64,7 @@ Container(
               alignment: Alignment.topCenter,
                 width: width*0.6,
                 height: height*0.06,
-                padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
+                //padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
                     
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)
                 ,color: Colors.white),
@@ -73,6 +73,8 @@ Container(
                   controller: _accountTitle,
     style: TextStyle(),
     decoration: InputDecoration(
+      contentPadding: EdgeInsets.symmetric(horizontal: width * 0.02, vertical: height * 0.01),
+
       hintText: 'Account Title',  // This is your placeholder text
       fillColor: Colors.black,focusColor: Colors.black,hoverColor: Colors.black,focusedBorder: UnderlineInputBorder(
       borderSide: BorderSide(color: Colors.black, width: 1.0),
@@ -87,7 +89,7 @@ Container(
               alignment: Alignment.topCenter,
                 width: width*0.6,
                 height: height*0.06,
-                padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
+                //padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
                     
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)
                 ,color: Colors.white),
@@ -95,7 +97,9 @@ Container(
                 child:TextField(
                   controller: _accountNo,
     style: TextStyle(),
-    decoration: InputDecoration(
+    decoration: InputDecoration(      
+      contentPadding: EdgeInsets.symmetric(horizontal: width * 0.02, vertical: height * 0.01),
+
       hintText: 'Account No.',  // This is your placeholder text
       fillColor: Colors.black,focusColor: Colors.black,hoverColor: Colors.black,focusedBorder: UnderlineInputBorder(
       borderSide: BorderSide(color: Colors.black, width: 1.0),
@@ -111,7 +115,7 @@ Container(
               alignment: Alignment.topCenter,
                 width: width*0.6,
                 height: height*0.06,
-                padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
+                //padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
                     
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)
                 ,color: Colors.white),
@@ -120,6 +124,8 @@ Container(
                   controller: _bankName,
     style: TextStyle(),
     decoration: InputDecoration(
+      contentPadding: EdgeInsets.symmetric(horizontal: width * 0.02, vertical: height * 0.01),
+
       hintText: 'Bank Name',  // This is your placeholder text
       fillColor: Colors.black,focusColor: Colors.black,hoverColor: Colors.black,focusedBorder: UnderlineInputBorder(
       borderSide: BorderSide(color: Colors.black, width: 1.0),
@@ -135,7 +141,7 @@ Container(
               alignment: Alignment.topCenter,
                 width: width*0.6,
                 height: height*0.06,
-                padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
+                //padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
                     
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)
                 ,color: Colors.white),
@@ -144,6 +150,8 @@ Container(
                   controller: _profession,
     style: TextStyle(),
     decoration: InputDecoration(
+      contentPadding: EdgeInsets.symmetric(horizontal: width * 0.02, vertical: height * 0.01),
+
       hintText: 'Profession (Gynecologist etc.)',  // This is your placeholder text
       fillColor: Colors.black,focusColor: Colors.black,hoverColor: Colors.black,focusedBorder: UnderlineInputBorder(
       borderSide: BorderSide(color: Colors.black, width: 1.0),
@@ -159,7 +167,7 @@ Container(
               alignment: Alignment.topCenter,
                 width: width*0.6,
                 height: height*0.06,
-                padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
+                //padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
                     
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)
                 ,color: Colors.white),
@@ -168,6 +176,8 @@ Container(
                   controller: _password,
     style: TextStyle(),
     decoration: InputDecoration(
+      contentPadding: EdgeInsets.symmetric(horizontal: width * 0.02, vertical: height * 0.01),
+
       hintText: 'Password',  // This is your placeholder text
       fillColor: Colors.black,focusColor: Colors.black,hoverColor: Colors.black,focusedBorder: UnderlineInputBorder(
       borderSide: BorderSide(color: Colors.black, width: 1.0),
@@ -182,7 +192,7 @@ Container(
               alignment: Alignment.topCenter,
                 width: width*0.6,
                 height: height*0.06,
-                padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
+                //padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
                     
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)
                 ,color: Colors.white),
@@ -191,6 +201,8 @@ Container(
                   controller: _confirmpassword,
     style: TextStyle(),
     decoration: InputDecoration(
+        contentPadding: EdgeInsets.symmetric(horizontal: width * 0.02, vertical: height * 0.01),
+
       hintText: 'Confirm Password',  // This is your placeholder text
       fillColor: Colors.black,focusColor: Colors.black,hoverColor: Colors.black,focusedBorder: UnderlineInputBorder(
       borderSide: BorderSide(color: Colors.black, width: 1.0),

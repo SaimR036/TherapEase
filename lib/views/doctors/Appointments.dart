@@ -84,7 +84,7 @@ class _Dr_AppointmentsState extends State<Dr_Appointments> {
                         var appointment = appointments[index];
 
                         // Ensure appointment is not null and contains expected keys
-                        String doctorName = details['Doctor'] ?? 'Unknown';
+                        String doctorName = appointment['Doctor'] ?? 'Unknown';
                         String date = appointment['Date'] ?? 'No Date';
                         String time = appointment['Time'] ?? 'No Time';
                         String price = appointment['Price'] ?? '0';
@@ -98,7 +98,7 @@ class _Dr_AppointmentsState extends State<Dr_Appointments> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           width: width * 0.9,
-                          height: height * 0.15,
+                          height: height * 0.18,
                           child: provider.user == 0
                               ? Column(
                                   mainAxisAlignment: MainAxisAlignment.start,

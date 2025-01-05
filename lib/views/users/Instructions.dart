@@ -1,5 +1,3 @@
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/bottom_navbar.dart';
 import 'package:flutter_application_1/providers/bottom_navbar_provider.dart';
@@ -35,30 +33,31 @@ class _InstructionsState extends State<Instructions> {
           Align(
             alignment: Alignment.topCenter,
             child: Container(
+              height: height*0.6,
               margin: EdgeInsets.fromLTRB(width*0.1,height*0.10,width*0.07,0),
               child: Text.rich( // Use Text.rich to style parts of the text differently
-      TextSpan(
-        children: [
-          TextSpan(
-            text: 'You have the option to run a psychological test for yourself. This test will give you a better understanding of your psychological needs. Please select the most appropriate answer that applied to you ',
-            style: TextStyle(fontFamily: 'Font', color: Colors.white, fontSize: 20),
-          ),
-          TextSpan(
-            text: 'over the past week',
-            style: TextStyle(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'You have the option to run a psychological test for yourself. This test will give you a better understanding of your psychological needs. Please select the most appropriate answer that applied to you ',
+                          style: TextStyle(fontFamily: 'Font', color: Colors.white, fontSize: height*0.022),
+                        ),
+                        TextSpan(
+                          text: 'over the past week',
+                          style: TextStyle(
               fontFamily: 'Font',
               color: Colors.black, // Set text color to black
-              fontSize: 20,
+              fontSize:  height*0.022,
               fontWeight: FontWeight.bold, // Make the text bold
-            ),
-          ),
-          TextSpan(
-            text: '. There are no right or wrong answers. Do not spend too much time on any statement.\n\nWould you like to take this test now? ',
-            style: TextStyle(fontFamily: 'Font', color: Colors.white, fontSize: 20),
-          ),
-        ],
-      ),
-    ),),
+                          ),
+                        ),
+                        TextSpan(
+                          text: '. There are no right or wrong answers. Do not spend too much time on any statement.\n\nWould you like to take this test now? ',
+                          style: TextStyle(fontFamily: 'Font', color: Colors.white, fontSize:  height*0.022),
+                        ),
+                      ],
+                    ),
+                  ),),
           ),
           Align(
             alignment: Alignment.topCenter,
@@ -81,8 +80,10 @@ class _InstructionsState extends State<Instructions> {
       child: BottomNavbar(),
     ));
             },
-            child: Text('Yes, take test',
-            style: TextStyle(fontFamily: 'Font',color: Colors.white,fontSize:20 ),
+            child: FittedBox(
+              child: Text('Yes, take test',
+              style: TextStyle(fontFamily: 'Font',color: Colors.white,fontSize:20 ),
+              ),
             )),)),
             Container(
             width: width*0.6,
@@ -93,7 +94,7 @@ class _InstructionsState extends State<Instructions> {
             ),
             child: TextButton(
             onPressed: (){
-              var navbar_provider = Provider.of<BottomNavbarProvider>(context);
+              var navbar_provider = Provider.of<BottomNavbarProvider>(context,listen: false);
             navbar_provider.toggleIndex(2);
               Navigator.pushReplacement( 
         context,
@@ -104,8 +105,10 @@ class _InstructionsState extends State<Instructions> {
 
             },
             
-            child: Text('Not now, explore app',
-            style: TextStyle(fontFamily: 'Font',color: Colors.white,fontSize:20 ),
+            child: FittedBox(
+              child: Text('Not now, explore app',
+              style: TextStyle(fontFamily: 'Font',color: Colors.white,fontSize:20 ),
+              ),
             )),)
 
 ]));

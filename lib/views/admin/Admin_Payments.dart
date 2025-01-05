@@ -73,11 +73,14 @@ class _PaymentApprovalPageState extends State<PaymentApprovalPage> {
         bool slotFound = false;
         for (var i = 0; i < slots.length; i++) {
           var slot = slots[i];
-
+          print('Dateee:');
+          print(slot['Date']);
+          print('TIMEE:');
+          print(slot['Time']);
           // Check if the slot matches the specified date and time
-          if (slot['Date'] == date && slot['Time'] == time) {
+          if (slot['Date'] == date.trim() && slot['Time'] == time.trim()) {
             // Set booked status to 1
-            slot['Booked'] = 1; // Update the slot to booked
+            slot['Booked'] = '1'; // Update the slot to booked
             slotFound = true;
             break;
           }
@@ -168,6 +171,7 @@ class _PaymentApprovalPageState extends State<PaymentApprovalPage> {
                       await FirebaseAuth.instance.signOut();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setInt('isLoggedIn', -1);
+  print(prefs.getInt('IsLoggedIn'));
                         provider.toggleUid('0');
                          Navigator.pushReplacement( 
                             context,
@@ -262,14 +266,14 @@ class _PaymentApprovalPageState extends State<PaymentApprovalPage> {
                                         child: Text("Approve",style: TextStyle(color: Colors.white)),
                                         style: ButtonStyle(
                                             backgroundColor:
-                                                MaterialStateProperty.all(Colors.green)),
+                                                WidgetStateProperty.all(Colors.green)),
                                       ),
                                       ElevatedButton(
                                         onPressed: () => updateStatus(data,id, false), // Disapprove
                                         child: Text("Disapprove",style: TextStyle(color: Colors.white)),
                                         style: ButtonStyle(
                                             backgroundColor:
-                                                MaterialStateProperty.all(Colors.red)),
+                                                WidgetStateProperty.all(Colors.red)),
                                       ),
                                     ],
                                   ),

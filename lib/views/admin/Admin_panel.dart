@@ -51,11 +51,6 @@ File? _image;
   Future<void> _pickImage() async {
     //final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     var pickedFile;
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
-    }
   }
     var _enlarged_width_1;
   var _enlarged_height_1;

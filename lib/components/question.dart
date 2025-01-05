@@ -43,7 +43,7 @@ class _QuestionState extends State<Questions> {
               Container(
                 margin: EdgeInsets.only(left: width*0.05,right: width*0.05),
                 alignment: Alignment.topLeft,
-                    child: Text('\u2022' +questions[20],style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15,fontFamily: 'Font',color: Colors.white),),),
+                    child: Text('\u2022' +questions[20],style: TextStyle( fontSize: 15,color: Colors.white),),),
         SizedBox(height: height*0.02,),
         Container(
           alignment: Alignment.topLeft,
@@ -70,7 +70,7 @@ class _QuestionState extends State<Questions> {
               child:FittedBox(
                 child: Text(
                 choices[i],
-                style: TextStyle(fontSize: 14, fontFamily: 'Font', color:  Colors.white),
+                style: TextStyle(fontSize: 14, color:  Colors.white),
                             ),
               )),
           ),
@@ -81,7 +81,7 @@ class _QuestionState extends State<Questions> {
         Container(
           margin: EdgeInsets.only(top: height*0.2),
           alignment: Alignment.center,
-          child: Text('Thank You!', style: TextStyle(color: Colors.white,fontFamily: 'Font',fontSize: 40),),)
+          child: Text('Thank You!', style: TextStyle(color: Colors.white,fontSize: 40),),)
 
         ],
           ),
@@ -93,7 +93,7 @@ class _QuestionState extends State<Questions> {
                 margin: EdgeInsets.only(left: width*0.05,right: width*0.05),
                 //margin: EdgeInsets.fromLTRB(0,height*0.05,0,0),
                 alignment: dir=='l'?Alignment.topLeft: Alignment.topRight,
-                    child: Text('\u2022' +questions[j],style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15,fontFamily: 'Font',color: Colors.white)
+                    child: Text('\u2022' +questions[j],style: TextStyle( fontSize: 15,color: Colors.white)
                     ,textDirection: dir=='l'? TextDirection.ltr:TextDirection.rtl,),),
         SizedBox(height: height*0.015,),
         Container(
@@ -122,7 +122,7 @@ class _QuestionState extends State<Questions> {
               child:FittedBox(
                 child: Text(
                 dir=='l'?choices[i]:urdu_choices[i],
-                style: TextStyle(fontSize: 14, fontFamily: 'Font', color:  Colors.white),
+                style: TextStyle(fontSize: 14, color:  Colors.white),
                             ),
               )),
           ),

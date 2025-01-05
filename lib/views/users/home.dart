@@ -1,11 +1,9 @@
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/providers/login_provider.dart';
 import 'package:flutter_application_1/views/users/video_player.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart'; // Add this package to format dates
 
@@ -273,7 +271,7 @@ class _HomeState extends State<Home> {
                                   borderRadius: BorderRadius.circular(10)
                                 ),
                                 width: width*0.9,
-                                height: height*0.15,
+                               // height: height*0.15,
                                 child:Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -302,7 +300,7 @@ class _HomeState extends State<Home> {
                                 child: Text(details['Profession'],style: TextStyle(color: Colors.white,fontSize: 15),)),
                                 SizedBox(width: width*0.30,),
                                 Container(
-                                  alignment: Alignment.topRight,
+                                  alignment: Alignment.centerRight,
                                 margin: EdgeInsets.fromLTRB(0,0,0,0),
                                 width: width*0.2,
                                 child: FittedBox(child: Text(details['Time'],style: TextStyle(color: Colors.white,fontSize: 15),))),
@@ -350,6 +348,16 @@ class _HomeState extends State<Home> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+
+              Container(
+                alignment: Alignment.center,
+                child: FittedBox(child: Text('Date: ${appointment['Date']}'),),),
+              Container(
+                alignment: Alignment.center,
+                child: FittedBox(child: Text('Time: ${appointment['Time']}'),),),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
               Container(
                 width: width*0.2,
                   alignment: Alignment.center,
@@ -358,7 +366,7 @@ class _HomeState extends State<Home> {
                   onChanged: (value) {
                     rating = value;
                   },
-                  decoration: InputDecoration(labelText: 'Rating (1-5)',
+                  decoration: InputDecoration(
                   enabledBorder: UnderlineInputBorder(
         borderSide: BorderSide(color: Color(0xFF239494)),
       ),
@@ -368,6 +376,10 @@ class _HomeState extends State<Home> {
                   keyboardType: TextInputType.number,
                 ),
               ),
+              Container(
+                alignment: Alignment.bottomCenter,
+                child: FittedBox(child: Text('Rating (1-5)'),),),
+              ]),
               TextField(
                 onChanged: (value) {
                   review = value;
@@ -429,17 +441,44 @@ class _HomeState extends State<Home> {
     );
   }
 
-  void _submitReview(String doctorId, String rating, String review) {
+  void _submitReview(String doctorId, String rating, String review) async{
     var reviewData = {
       'Rating': rating,
       'Review': review,
       'Pname': Name + '.'
     };
+    var firestore = FirebaseFirestore.instance;
+
+  // Convert the new rating to a float
+  double newRating = double.parse(rating);
+
+  // Reference to the doctor's document
+  var doctorDocRef = firestore.collection('Doctors').doc(doctorId);
+
+  // Get the current data of the doctor
+  var doctorSnapshot = await doctorDocRef.get();
+  if (!doctorSnapshot.exists) {
+    print('Doctor not found!');
+    return;
+  }
+  // Get the current Rating and Reviews count
+  double currentRating = doctorSnapshot.data()?['Rating'] != null
+      ? double.parse(doctorSnapshot.data()!['Rating'].toString())
+      : 0.0;
+  int reviewCount = doctorSnapshot.data()?['Reviews'] != null
+    ? doctorSnapshot.data()!['Reviews'].length: 0;
+
+  // Calculate the new average rating
+  double totalRating = currentRating * reviewCount + newRating;
+  int newReviewCount = reviewCount + 1;
+  double updatedRating = totalRating / newReviewCount;
 
     FirebaseFirestore.instance
         .collection('Doctors')
         .doc(doctorId) // Make sure to use the correct field for Doctor ID
         .update({
+      'Rating': updatedRating.toString(), // Store the updated rating as a string
+
       'Reviews': FieldValue.arrayUnion([reviewData]), // Append to reviews field
     }).then((value) {
        ScaffoldMessenger.of(context).showSnackBar(

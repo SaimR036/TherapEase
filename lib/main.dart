@@ -8,24 +8,9 @@ import 'package:flutter_application_1/providers/Indexes_st.dart';
 import 'package:flutter_application_1/providers/bottom_navbar_provider.dart';
 import 'package:flutter_application_1/providers/enlarger_provider.dart';
 import 'package:flutter_application_1/providers/parent_info_container.dart';
-import 'package:flutter_application_1/views/admin/Admin_Payments.dart';
-import 'package:flutter_application_1/views/admin/Applications.dart';
-import 'package:flutter_application_1/views/doctors/App_Status.dart';
-import 'package:flutter_application_1/views/doctors/Appointments.dart';
-import 'package:flutter_application_1/views/doctors/Bank_Details.dart';
-import 'package:flutter_application_1/views/doctors/Reviews.dart';
 import 'package:flutter_application_1/views/doctors/Slots.dart';
-import 'package:flutter_application_1/views/doctors/Therapists_Home.dart';
-import 'package:flutter_application_1/views/users/profile.dart';
-import 'package:flutter_application_1/views/users/set_meet.dart';
-import 'package:flutter_application_1/views/admin/Admin_panel.dart';
 import 'package:flutter_application_1/views/users/Instructions.dart';
-import 'package:flutter_application_1/views/users/Language.dart';
 import 'package:flutter_application_1/views/users/Login.dart';
-import 'package:flutter_application_1/views/users/Therapists.dart';
-import 'package:flutter_application_1/views/users/home.dart';
-import 'package:flutter_application_1/views/users/questionnaire.dart';
-import 'package:flutter_application_1/views/users/test1.dart';
 import 'dart:async';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart'; 
@@ -75,7 +60,8 @@ class MyApp extends StatefulWidget { // Convert to StatefulWidget for animation
 class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-  
+  late Animation<Offset> _slideAnimation;
+
   @override
   void initState() {
     super.initState();
@@ -88,6 +74,13 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
     
   
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
+     _slideAnimation = Tween<Offset>(
+      begin: Offset(0, -1), // Starts above the screen
+      end: Offset(0, 0),    // Ends in its original position
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
     _animationController.forward(); // Start the animation
   }
 
@@ -99,9 +92,9 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
    Future<void> _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int? isLoggedIn = prefs.getInt('isLoggedIn');
-    if(isLoggedIn==null)
+    if(isLoggedIn==null || isLoggedIn ==-1)
     {
-      Timer(const Duration(seconds: 3), () {
+      Timer(const Duration(seconds: 2), () {
       Navigator.pushReplacement( 
         context,
         PageTransition(
@@ -118,8 +111,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
     navbarProvider.toggleUid(user?.uid);
     navbarProvider.toggleUser(isLoggedIn); // Set the initial index
 
-    print(user);
-    Timer(const Duration(seconds: 3), () {
+    Timer(const Duration(seconds: 2), () {
       Navigator.pushReplacement( 
         context,
         PageTransition(
@@ -137,8 +129,22 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
-    
-      body: Stack(
+      
+      body:  Container(
+        width: width,
+        height: height,
+decoration: BoxDecoration(
+gradient: LinearGradient(
+begin: Alignment.topCenter, // Gradient starting point
+end: Alignment.bottomCenter, // Gradient ending point
+colors: [
+Color(0xFF05696A), // First hex color (Blue)
+Color(0xFF29BDBD), // Second hex color (Red)
+],
+),
+),
+child:SingleChildScrollView(
+  child: Column(
         children: [
           Container(
 decoration: BoxDecoration(
@@ -152,20 +158,42 @@ Color(0xFF29BDBD), // Second hex color (Red)
 ),
 ),
 ),
+SlideTransition(
+      position: _slideAnimation,
+      child: Container(
+        width: width * 0.5,
+        alignment: Alignment.topCenter,
+        margin: EdgeInsets.fromLTRB(0, 0.30 * height, 0, 0),
+        child: Image.asset(
+          'lib/assets/therapease_logo.png',
+        ),
+      ),
+    ),
+          //   FadeTransition(
+          //   opacity: _slideAnimation,
+          //   child: Container(
+          //     width: width*0.5,
+          //     //height: height*0.4,
+          //     alignment: Alignment.topCenter,
+          //     margin: EdgeInsets.fromLTRB(0, 0.30 * height,0,0),
 
+          //     child: Image.asset(
+          //      'lib/assets/therapease_logo.png',
+          //     ),
+          //   ),
+          // ),
           // FadeTransition for both Text widgets
           FadeTransition(
             opacity: _fadeAnimation,
             child: Container(
-              alignment: Alignment.topCenter,
-              margin: EdgeInsets.fromLTRB(0, 0.40 * height,0,0),
+              //margin: EdgeInsets.fromLTRB(0, 0.40 * height,0,0),
 
               child: Text(
                 'TherapEase',
                 style: TextStyle(
-                  color: const Color(0xFF00FDFD),
+                  color: Color(0xFF87A96B),
                   fontFamily: 'Font',
-                  fontSize: 40,
+                  fontSize: 25,
                 ),
               ),
             ),
@@ -175,20 +203,20 @@ Color(0xFF29BDBD), // Second hex color (Red)
             child: Container(
               alignment: Alignment.topCenter,
 
-              margin: EdgeInsets.fromLTRB(0, 0.48 * height,0,0),
-              child: const Text(
+              //margin: EdgeInsets.fromLTRB(0, 0.48 * height,0,0),
+              child: Text(
                 'Therapy made easy',
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: 'Font',
-                  fontSize: 12,
+                  fontSize: 20,
                 ),
               ),
             ),
           ),
         ],
       ),
-    );
+    )));
   }
 }
 

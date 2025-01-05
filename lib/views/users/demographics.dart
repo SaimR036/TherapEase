@@ -51,20 +51,22 @@ Align(
 ),
 Container(
     margin: EdgeInsets.fromLTRB(width*0.05, height*0.26, 0,0),
-    child: Text("Age range",style: TextStyle(
-      fontSize: 20,
-      fontFamily: 'Font',color: Colors.white),),),
+    child: FittedBox(
+      child: Text("Age range",style: TextStyle(
+        fontSize: 20,
+        fontFamily: 'Font',color: Colors.white),),
+    ),),
 Container(
     margin: EdgeInsets.fromLTRB(width*0.60, height*0.16, 0,0),
     child: TextButton(
       
       style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10), 
  // Set borderRadius to zero
         ),),
-          backgroundColor: MaterialStateProperty.all(
+          backgroundColor: WidgetStateProperty.all(
             age_index==0 ? Colors.green : Colors.transparent,
           )),
       onPressed: (){
@@ -79,12 +81,12 @@ Container(
     margin: EdgeInsets.fromLTRB(width*0.61, height*0.23, 0,0),
     child: TextButton(
       style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10), 
  // Set borderRadius to zero
         ),),
-          backgroundColor: MaterialStateProperty.all(
+          backgroundColor: WidgetStateProperty.all(
             age_index==1 ? Colors.green : Colors.transparent,
           )),
       onPressed: (){
@@ -100,12 +102,12 @@ Container(
     margin: EdgeInsets.fromLTRB(width*0.61, height*0.30, 0,0),
     child: TextButton(
       style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10), 
  // Set borderRadius to zero
         ),),
-          backgroundColor: MaterialStateProperty.all(
+          backgroundColor: WidgetStateProperty.all(
             age_index ==2 ? Colors.green : Colors.transparent,
           )),
       onPressed: (){
@@ -121,12 +123,12 @@ Container(
     margin: EdgeInsets.fromLTRB(width*0.67, height*0.36, 0,0),
     child: TextButton(
       style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10), 
  // Set borderRadius to zero
         ),),
-          backgroundColor: MaterialStateProperty.all(
+          backgroundColor: WidgetStateProperty.all(
             age_index ==3 ? Colors.green : Colors.transparent,
           )),
       onPressed: (){
@@ -158,12 +160,12 @@ Container(
     margin: EdgeInsets.fromLTRB(width*0.66, height*0.44, 0,0),
     child: TextButton(
       style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10), 
  // Set borderRadius to zero
         ),),
-          backgroundColor: MaterialStateProperty.all(
+          backgroundColor: WidgetStateProperty.all(
             gender_index==0 ? Colors.green : Colors.transparent,
           )),
       onPressed: (){
@@ -180,12 +182,12 @@ Container(
     margin: EdgeInsets.fromLTRB(width*0.63, height*0.51, 0,0),
     child: TextButton(
       style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10), 
  // Set borderRadius to zero
         ),),
-          backgroundColor: MaterialStateProperty.all(
+          backgroundColor: WidgetStateProperty.all(
             gender_index==1 ? Colors.green : Colors.transparent,
           )),
       onPressed: (){
@@ -216,12 +218,12 @@ Container(
     margin: EdgeInsets.fromLTRB(width*0.62, height*0.64, 0,0),
     child: TextButton(
       style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10), 
  // Set borderRadius to zero
         ),),
-          backgroundColor: MaterialStateProperty.all(
+          backgroundColor: WidgetStateProperty.all(
             occup_index ==0 ? Colors.green : Colors.transparent,
           )),
       onPressed: (){
@@ -237,12 +239,12 @@ Container(
     margin: EdgeInsets.fromLTRB(width*0.62, height*0.7, 0,0),
     child: TextButton(
       style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10), 
  // Set borderRadius to zero
         ),),
-          backgroundColor: MaterialStateProperty.all(
+          backgroundColor: WidgetStateProperty.all(
             occup_index ==1 ? Colors.green : Colors.transparent,
           )),
       onPressed: (){
@@ -261,12 +263,12 @@ Container(
     margin: EdgeInsets.fromLTRB(width*0.49, height*0.76, 0,0),
     child: TextButton(
       style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10), 
  // Set borderRadius to zero
         ),),
-          backgroundColor: MaterialStateProperty.all(
+          backgroundColor: WidgetStateProperty.all(
             occup_index ==2 ? Colors.green : Colors.transparent,
           )),
       onPressed: (){
@@ -290,12 +292,12 @@ Container(
               margin: EdgeInsets.fromLTRB(0, height*0.85, 0,0),
               child: TextButton(
                 style: ButtonStyle(
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10), 
            // Set borderRadius to zero
           ),),
-            backgroundColor: MaterialStateProperty.all(
+            backgroundColor: WidgetStateProperty.all(
              Color(0xFF05696A) 
             )),
                 onPressed: () async{

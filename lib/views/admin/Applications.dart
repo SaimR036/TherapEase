@@ -106,6 +106,7 @@ class _TherapistApplicationsPageState extends State<TherapistApplicationsPage> {
                     final application = applications[index];
                     return Container(
                       padding: EdgeInsets.all(5),
+                      margin: EdgeInsets.only(bottom: height*0.01),
                      width: width*0.8,
                      //height: height*0.3,
                       decoration: BoxDecoration(
@@ -124,10 +125,15 @@ class _TherapistApplicationsPageState extends State<TherapistApplicationsPage> {
                                   width: 100,
                                   child: Image.network(application['ImageUrl'].toString(), fit: BoxFit.cover)),
                               // Display the resume link as a button
-                      Text(application['Name'] ?? 'No Name',style: TextStyle(color: Colors.white),),
                       Container(
+                        width: width*0.5,
+                        height: height*0.05,
+                        child: FittedBox(child: Text(application['Name'] ?? 'No Name',style: TextStyle(color: Colors.white),))),
+                      Container(
+                        width: width*0.5,
+                        height: height*0.05,
                         margin: EdgeInsets.only(left: 5),
-                        child: Text('Email: ${application['Email'] ?? 'No Email'}',style: TextStyle(color: Colors.white))),
+                        child: FittedBox(child: Text('Email: ${application['Email'] ?? 'No Email'}',style: TextStyle(color: Colors.white)))),
 
                       ],),
                       SizedBox(width: width*0.1,),

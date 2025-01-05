@@ -1,10 +1,8 @@
-import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/components/bottom_navbar.dart';
 import 'package:flutter_application_1/providers/login_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -63,7 +61,7 @@ class _Therapists_HomeState extends State<Therapists_Home> {
                   child: Container(
                     margin: EdgeInsets.only(top: height*0.05),
                     width: width*0.6,
-                    child: FittedBox(child: Text('Welcome Back $username!',style: TextStyle(color: Colors.white,fontSize: 40),)),),
+                    child: FittedBox(child: Text('Welcome Back!',style: TextStyle(color: Colors.white,fontSize: 40),)),),
                 )
                 ,
                 SizedBox(height: height*0.1,),

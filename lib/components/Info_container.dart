@@ -356,16 +356,14 @@ Center(
                                                     height: height*0.16,
                                                     //margin: EdgeInsets.fromLTRB(width*0.05, height*0.11,0,0),
                                                     child: Consumer<ParentInfoContainer>( // Use Consumer here
-              builder: (context, provider, child) {
-                return ListView.builder(
-                                                                          itemCount: Slots.length,
+                                                          builder: (context, provider, child) {
+                                                          
+                                                                           return ListView.builder(
+                                                                          itemCount: provider.big_slots.length,
                                                                           itemBuilder: (context, index) {
-                                                                            if(Slots.length>0)
-                                                                            {
-                                                                              provider.toggleTime(Slots[index]);
-                                                                            }
-                                                                            var slot = Slots[index];
-                                                                            return Container(
+                                                                            
+                                                                            var slot = provider.big_slots[index];
+                                                                            return  Container(
                                                                               decoration: BoxDecoration(
                                                                                 borderRadius: BorderRadius.circular(10),
                                                                                 color: provider.selected_slot_index==index? Colors.green:Colors.transparent),
@@ -518,13 +516,13 @@ _showAnimatedDialog(context);
                             fontSize: 40
                           ),
                         ),)),             
-                        SizedBox(width: IndProvider.ind==index? width*0.03: width*0.04,), 
+                        SizedBox(width: IndProvider.ind==index? width*0.015: width*0.025,), 
                       AnimatedContainer(
                         alignment: Alignment.centerRight,
                         duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 700,microseconds:0),
                                   
-                        width: IndProvider.ind==index? width*0.03: width*0.02,
-                        height:  IndProvider.ind==index? height*0.04:height * 0.03,
+                        width: IndProvider.ind==index? width*0.06: width*0.06,
+                        height:  IndProvider.ind==index? height*0.07:height * 0.07,
                        // margin: EdgeInsets.fromLTRB(IndProvider.ind==index? width*0.52: width*0.50,IndProvider.ind==index?normal_height*0.65: normal_height* 0.56, 0,0),
                         child: FittedBox( // <-- Add FittedBox widget
                        // alignment: Alignment.centerLeft,
@@ -540,9 +538,9 @@ _showAnimatedDialog(context);
                           duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 700,microseconds:0),
                         
                                     //alignment: Alignment.topRight,
-                                    width: width*0.015,
+                                    width: width*0.012,
                                     
-                                    child: Icon(Icons.star,color: Colors.white,size: IndProvider.ind==index? height*0.03:height * 0.02,)), 
+                                    child: Icon(Icons.star,color: Colors.white,size: IndProvider.ind==index? height*0.025:height * 0.015,)), 
                       ]),
                     ),  
                    
@@ -588,21 +586,20 @@ _showAnimatedDialog(context);
                           loadingProvider.toggleFetching();
                               // Check if the document exists
                               if (docSnapshot.exists) {
-                                // Retrieve the 'Slots' field, which is expected to be a list of maps
-                                setState(() {
-                                  slots = docSnapshot['Slots'];
-                                });
+                                parentProvider.toggleSmallSlots(docSnapshot['Slots']);
+                               
                                 
-                                print(slots);
-                                if (slots != null) {
-                                  // Return the list of slots
-                                } else {
-                                  print("No slots found.");
-                                  return null; // No slots found
-                                }
-                              } else {
-                                print("Document does not exist.");
-                                return null; // Document does not exist
+                              //   print(slots);
+                              //   if (slots != null) {
+                              //     // Return the list of slots
+                              //   } else {
+                              //     print("No slots found.");
+                              //     return null; // No slots found
+                              //   }
+                              // } else {
+                              //   print("Document does not exist.");
+                              //   return null; // Document does not exist
+                              // }
                               }
                             } catch (error) {
                               // Handle any errors that occur
@@ -634,20 +631,18 @@ _showAnimatedDialog(context);
                               // Check if the document exists
                               if (docSnapshot.exists) {
                                 // Retrieve the 'Slots' field, which is expected to be a list of maps
-                                setState(() {
-                                  slots = docSnapshot['Slots'];
-                                });
-                                
-                                print(slots);
-                                if (slots != null) {
-                                  // Return the list of slots
-                                } else {
-                                  print("No slots found.");
-                                  return null; // No slots found
-                                }
-                              } else {
-                                print("Document does not exist.");
-                                return null; // Document does not exist
+                                parentProvider.toggleSmallSlots(docSnapshot['Slots']);
+
+                              //   print(slots);
+                              //   if (slots != null) {
+                              //     // Return the list of slots
+                              //   } else {
+                              //     print("No slots found.");
+                              //     return null; // No slots found
+                              //   }
+                              // } else {
+                              //   print("Document does not exist.");
+                              //   return null; // Document does not exist
                               }
                             } catch (error) {
                               // Handle any errors that occur
@@ -668,7 +663,7 @@ _showAnimatedDialog(context);
                           }
                               },
                               icon: parentProvider.calendar_show==index?Icon(Icons.arrow_upward_sharp,color: Colors.white,size: 20,): Icon(Icons.arrow_drop_down,color: Colors.white,size: 20,) // Down arrow icon
-                              ,label: Text('Select Slots',style: TextStyle(fontSize: 10, fontFamily: 'Font',color: Colors.white)), // Text label
+                              ,label: Text('Slots',style: TextStyle(fontSize: 10, fontFamily: 'Font',color: Colors.white)), // Text label
                             ),
                           )
                          
@@ -827,7 +822,8 @@ _showAnimatedDialog(context);
       String formattedDay = DateFormat('EEEE, MMMM d, y').format(day);
 
           // Check if the calendar day matches any of the slot dates
-          bool isSlotDay = slots.any((slot) => slot['Date'] == formattedDay);
+          bool isSlotDay = parentProvider.small_slots.any((slot) =>
+    slot['Date'] == formattedDay && slot['Booked'] == '0');
 
           // If the day matches a slot's date, apply a custom style or decoration
           if (isSlotDay) {
@@ -841,16 +837,19 @@ _showAnimatedDialog(context);
             radius: 50,
             onTap:(){ 
               String selectedDate = DateFormat('EEEE, MMMM d, y').format(day);
-              var matchingSlots = slots.where((slot) => slot['Date'] == formattedDay).toList();
-              setState(() {
-                Slots = matchingSlots.map((slot) => slot['Time'] + '  Rs. '+slot['Price'] as String).toList();
-              }); 
+              var matchingSlots = parentProvider.small_slots.where((slot) => slot['Date'] == formattedDay && slot['Booked']=='0').toList();
+              parentProvider.toggleBigSlots(matchingSlots.map((slot) => slot['Time'] + '  Rs. '+slot['Price'] as String).toList());
+              if(parentProvider.big_slots.length>0)
+                                                                            {
+                                                                              parentProvider.toggleTime(parentProvider.big_slots[0]);
+                                                                            }
               parentProvider.toggleAlotDate(selectedDate); _showCustomDialog(context,loadingProvider);},
               
             child:Text('${day.day}',
             style: TextStyle(color: Colors.white),
           )),
-        );}}),
+        );}
+          return null;}),
                           availableCalendarFormats: const {CalendarFormat.month:'Month'},
                           calendarStyle: CalendarStyle(),
                           shouldFillViewport: true,

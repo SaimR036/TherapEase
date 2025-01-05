@@ -5,6 +5,7 @@ import 'package:flutter_application_1/providers/login_provider.dart';
 import 'package:flutter_application_1/views/admin/Admin_Payments.dart';
 import 'package:flutter_application_1/views/admin/Admin_panel.dart';
 import 'package:flutter_application_1/views/admin/Applications.dart';
+import 'package:flutter_application_1/views/admin/user_results.dart';
 import 'package:flutter_application_1/views/doctors/Appointments.dart';
 import 'package:flutter_application_1/views/doctors/Reviews.dart';
 import 'package:flutter_application_1/views/doctors/Slots.dart';
@@ -55,7 +56,8 @@ class _BottomNavbarState extends State<BottomNavbar> {
       _pages = [
         TherapistApplicationsPage(),
         PaymentApprovalPage(),
-        Admin()
+        Admin(),
+        UserResultsPage()
       ];
     }
 
@@ -174,6 +176,12 @@ class _BottomNavbarState extends State<BottomNavbar> {
                       children: [
                         Image.asset('lib/assets/management.png', height: 24),
                         const Text('Management', style: TextStyle(fontSize: 10)),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Image.asset('lib/assets/resultslogo.png', height: 24),
+                        const Text('Results', style: TextStyle(fontSize: 10)),
                       ],
                     ),
                   ],

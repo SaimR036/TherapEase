@@ -52,10 +52,13 @@ Container(
   child: TextField(controller: email,cursorColor: Colors.black,  decoration: InputDecoration(hintText: 'Enter Email',fillColor: Colors.black,focusColor: Colors.black,hoverColor: Colors.black,focusedBorder: UnderlineInputBorder(
       borderSide: BorderSide(color: Colors.black, width: 1.0),
     ),
+          contentPadding: EdgeInsets.symmetric(horizontal: width * 0.02, vertical: height * 0.01),
+
     // Customize the enabled border (when the TextField is not focused)
     enabledBorder: UnderlineInputBorder(
       borderSide: BorderSide(color: Colors.black, width: 1.0),
-    ),),),),
+    ),
+    ),),),
   SizedBox(height: height*0.05,),
   Container(
   width: width*0.3,

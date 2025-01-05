@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/bottom_navbar.dart';
 import 'package:flutter_application_1/components/question.dart';
 import 'package:flutter_application_1/providers/bottom_navbar_provider.dart';
+import 'package:flutter_application_1/providers/login_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/Indexes_st.dart';
@@ -62,11 +63,13 @@ List<String> urdu_questions =["میرے لیے اپنے غصے پر قابو پ�
 var st=0;
 var results =2;
 var dep_word="";
+
 var eng=0;
 var anx_word="";
 var str_word="";
   @override
   Widget build(BuildContext context) {
+    var loginprovider = Provider.of<LoginProvider>(context);
     var provider = Provider.of<Indexes>(context);
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
@@ -113,7 +116,7 @@ child:SingleChildScrollView(
               Container(
                 alignment: Alignment.topCenter,
                 margin: EdgeInsets.fromLTRB(0,height*0.35,0,height*0.05),
-                child:Text('Please select a language',style: TextStyle(fontFamily: 'Font',color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),),),
+                child:FittedBox(child: Text('Please select a language',style: TextStyle(fontFamily: 'Font',color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),)),),
               if(results==2)
                 Container(
                 alignment: Alignment.topCenter,
@@ -156,7 +159,7 @@ child:SingleChildScrollView(
               Container(
                 margin: EdgeInsets.only(left: width*0.05,right: width*0.05,bottom: height*0.05),
                 alignment: Alignment.topCenter,
-                child:Text("${dep_word+anx_word+str_word}",style: TextStyle(fontFamily: 'Font',color: Colors.white,fontSize: 16,fontWeight: FontWeight.bold),),),
+                child:Text("Dear user, thank you for attempting the test, the results are shown below: \n\n ${dep_word+anx_word+str_word}",style: TextStyle(color: Colors.white,fontSize: 16),),),
               if(results==1)
                Container(
                 alignment: Alignment.topCenter,
@@ -174,7 +177,8 @@ child:SingleChildScrollView(
               Container(
                 alignment: Alignment.topCenter,
                 margin: EdgeInsets.fromLTRB(0,height*0.04,0,0),
-                child:Text('Statements',style: TextStyle(fontFamily: 'Font',color: Color(0xFF29BDBD),fontSize: 33,fontWeight: FontWeight.bold),),),
+                width: width*0.7,
+                child:FittedBox(child: Text('Statements',style: TextStyle(fontFamily: 'Font',color: Color(0xFF29BDBD),fontSize: 33,fontWeight: FontWeight.bold),)),),
               if(results==0)
 
               SizedBox(height: height*0.02,),
@@ -242,7 +246,8 @@ child:SingleChildScrollView(
                       if (st>=17)
                       {
                         var check=-1;
-                        for(int i=0;i<21;i++)
+                        var i=0;
+                        while(i<21)
                         {
                           if (provider.indexes[i]==-1)
                           {
@@ -255,8 +260,9 @@ child:SingleChildScrollView(
                         ),
                       );
                       check=1;
+                      break;
                           }
-                          break;
+                          i+=1;
                         }
                         
                             
@@ -283,24 +289,8 @@ child:SingleChildScrollView(
     },
   );
                           
-                          final CollectionReference testsCollection = 
-                            FirebaseFirestore.instance.collection('users');
-                            
-                              // Check if a document with the desired ID already exists
-                            //   final documentSnapshot = await testsCollection.doc(email).get(); // Replace 'your_document_id' with the actual ID you want to use
-                            
-                            //   if (documentSnapshot.exists) {
-                            //     // Document exists, overwrite it
-                            //     await testsCollection.doc('0udrDWeB2NTRglYz1E4htrucTkk2').update({
-                            // 'Test_Results': provider.indexes, // Update the 'indexes' field
-                            //     });
-                            //   }
-                            //   else {
-                            //     // Document doesn't exist, create a new one
-                            //     await testsCollection.doc('0udrDWeB2NTRglYz1E4htrucTkk2').set({
-                            // 'Test_Results': provider.indexes,
-                            //     });
-                            //   }
+                         
+                        var d_check=0; var s_check=0; var a_check=0;
                         var d_score = provider.indexes[2] + provider.indexes[4] + provider.indexes[9] + provider.indexes[12] + provider.indexes[15] + provider.indexes[16] + provider.indexes[20];
                         var a_score = provider.indexes[1] + provider.indexes[3] + provider.indexes[6] + provider.indexes[8] + provider.indexes[14] + provider.indexes[18] + provider.indexes[19];
                         var s_score = provider.indexes[0] + provider.indexes[5] + provider.indexes[7] + provider.indexes[10] + provider.indexes[11] + provider.indexes[13] + provider.indexes[17];
@@ -319,15 +309,17 @@ child:SingleChildScrollView(
                         if (d_score >= 11 && d_score <=13)
                         {
                           dep_word = "You frequently feel very down, struggle to find joy, and may feel that life lacks meaning or enthusiasm. Moreover, ";
+                          d_check=1;
                         }
                         if (d_score >=14)
                         {
                           dep_word = "You almost always feel deeply down, find little to no joy, and may feel that life is meaningless and without worth. Moreover, ";
+                          d_check=1;
                         }
 
                         if (a_score <=3)
                         {
-                          anx_word = "you rarelyfeel anxious, almost never experience panic, and generally do not have breathing difficulties or feel scared.";
+                          anx_word = "you rarely feel anxious, almost never experience panic, and generally do not have breathing difficulties or feel scared.";
                         }
                         if (a_score >=4 && a_score <=5)
                         {
@@ -340,31 +332,44 @@ child:SingleChildScrollView(
                         if (a_score >=8 && a_score <=9)
                         {
                           anx_word = "you almost always feel very anxious, often experience panic, and regularly have symptoms like trembling, breathing difficulties, or feeling scared without clear reasons.";
+                          a_check=1;
                         }
                         if (a_score >=10)
                         {
                           anx_word = "you always feel extremely anxious, often experience intense panic, and may struggle with severe trembling, breathing difficulties, and overwhelming fear.";
+                          a_check=1;
                         }
                         if (s_score <=7)
                         {
-                          str_word = "Furthermore, you rarely feel stressed, usually remain calm, and find it easy to relax without feeling agitated or intolerant.";
+                          str_word = " Furthermore, you rarely feel stressed, usually remain calm, and find it easy to relax without feeling agitated or intolerant.";
                         }
                         if(s_score >=8 && s_score <=9)
                         {
-                          str_word = "Furthermore, you sometimes feel stressed, may occasionally over-react, and might find it slightly difficult to relax or become agitated.";
+                          str_word = " Furthermore, you sometimes feel stressed, may occasionally over-react, and might find it slightly difficult to relax or become agitated.";
                         }
-                        if(s_score >=10 && s_score >=12)
+                        if(s_score >=10 && s_score <=12)
                         {
-                          str_word = "Furthermore, you often ( feel stressed, tend to over-react in certain situations, and can find it difficult to relax or may feel agitated at times.";
+                          str_word = " Furthermore, you often feel stressed, tend to over-react in certain situations, and can find it difficult to relax or may feel agitated at times.";
                         }
                         if(s_score >= 13 && s_score <= 16)
                         {
-                          str_word = "Furthermore, you frequently (baar baar) feel very stressed, often over-react, and regularly struggle to relax, feeling agitated or intolerant towards interruptions.";
+                          str_word = " Furthermore, you frequently feel very stressed, often over-react, and regularly struggle to relax, feeling agitated or intolerant towards interruptions.";
+                          s_check=1;
                         }
                         if(s_score >=17)
                         {
-                          str_word = "Furthermore, you almost always (taqreeban hamesha) feel extremely stressed, frequently over-react, and find it nearly impossible to relax, feeling constantly agitated and intolerant.";
+                          str_word = " Furthermore, you almost always feel extremely stressed, frequently over-react, and find it nearly impossible to relax, feeling constantly agitated and intolerant.";
+                          s_check=1;
                         }
+                        if ((d_check==1 && s_check==1) || (d_check==1 && a_check==1) || (s_check==1 && a_check==1) )
+                        {
+                          str_word += " The overall results are higher than normal so we suggest you to do the free daily exercises and attend our in-app therapy sessions from top-notch therapists";
+                        }
+
+                            await FirebaseFirestore.instance.collection('users').doc(loginprovider.uid).set({
+              'Results': dep_word+anx_word+str_word,
+            }, SetOptions(merge: true)); // Merge with existing data
+
                         ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text("Thank you for submitting."), // Use display name if available

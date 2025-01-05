@@ -5,9 +5,7 @@ import 'package:flutter_application_1/providers/bottom_navbar_provider.dart';
 import 'package:flutter_application_1/providers/login_provider.dart';
 import 'package:flutter_application_1/views/doctors/App_Status.dart';
 import 'package:flutter_application_1/views/users/demographics.dart';
-import 'package:flutter_application_1/views/users/home.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:page_transition/page_transition.dart'; 
 import 'package:provider/provider.dart';
@@ -135,15 +133,18 @@ child:SingleChildScrollView(
   
             // FadeTransition for both Text widgets
             AnimatedContainer(
+              width: width*0.7,
               duration: Duration(days: 0,hours: 0,minutes: 0,seconds: 0,milliseconds: 200,microseconds:0),
   alignment: Alignment.topCenter,
               margin:  EdgeInsets.fromLTRB(0,0.10 * height, 0, 0),
-              child: Text(
-                'TherapEase',
-                style: TextStyle(
-                  color: const Color(0xFF00FDFD),
-                  fontFamily: 'Font',
-                  fontSize: 46,
+              child: FittedBox(
+                child: Text(
+                  'TherapEase',
+                  style: TextStyle(
+                    color: const Color(0xFF00FDFD),
+                    fontFamily: 'Font',
+                    fontSize: 46,
+                  ),
                 ),
               ),
             ),
@@ -267,23 +268,26 @@ child:SingleChildScrollView(
   // SizedBox(height: height*0.02,),
   
             if(loginProvider.isLoginView==false && loginProvider.isTherapist==false)
-           Container(
-              alignment: Alignment.topCenter,
-                width: width*0.7,
-                height: height*0.06,
-                padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
-                    
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)
-                ,color: Colors.white),
-                margin: EdgeInsets.fromLTRB(0, 0, 0, height*0.03),
-                child:TextField(
-                  controller: _nameController,
-    style: TextStyle(),
+          Container(
+  alignment: Alignment.topCenter,
+  width: width * 0.7,
+  height: height * 0.06,
+  //padding: EdgeInsets.symmetric(horizontal: width * 0.01), // Padding for the container
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(10),
+    color: Colors.white,
+  ),
+  margin: EdgeInsets.only(bottom: height * 0.03),
+  child: TextField(
+    controller: _nameController,
+    style: TextStyle(), // Define text style if needed
     decoration: InputDecoration(
       border: InputBorder.none,
-      hintText: 'Name',  // This is your placeholder text
+      hintText: 'Name', // Placeholder text
+      contentPadding: EdgeInsets.symmetric(horizontal: width * 0.02, vertical: height * 0.01),
     ),
-  ),),
+  ),
+),
   if(loginProvider.isLoginView==true)
   SizedBox(height:height*0.1),
 
@@ -292,7 +296,7 @@ child:SingleChildScrollView(
   
                 width: width*0.7,
                 height: height*0.06,
-                padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
+                //padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
                     
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)
                 ,color: Colors.white),
@@ -302,6 +306,8 @@ child:SingleChildScrollView(
     style: TextStyle(),
     decoration: InputDecoration(
       border: InputBorder.none,
+      contentPadding: EdgeInsets.symmetric(horizontal: width * 0.02, vertical: height * 0.01),
+
       hintText: loginProvider.isLoginView==false && loginProvider.isTherapist==true?'Full Name':'Email',  // This is your placeholder text
     ),
   ),),
@@ -310,7 +316,7 @@ child:SingleChildScrollView(
   
                 width: width*0.7,
                 height: height*0.06,    
-                padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
+               // padding: EdgeInsets.fromLTRB(0.01 * width, 0.01 * height,0.01 * width,1),
                     
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)
                 ,color: Colors.white),
@@ -318,7 +324,9 @@ child:SingleChildScrollView(
                 child:TextField(
     style: TextStyle(),
     controller: _passwordController,
-    decoration: InputDecoration(
+    decoration: InputDecoration(      
+      contentPadding: EdgeInsets.symmetric(horizontal: width * 0.02, vertical: height * 0.01),
+
       border: InputBorder.none,
       hintText: loginProvider.isLoginView==false && loginProvider.isTherapist==true? 'Email':'Password',  // This is your placeholder text
     ),
@@ -404,7 +412,7 @@ child:SingleChildScrollView(
                       if (loginProvider.isLoginView) {
       String email = _emailController.text;
       String password = _passwordController.text;
-  
+      
       try {
         // 1. Firebase Sign-In Attempt
         UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -453,7 +461,6 @@ DocumentSnapshot userSnapshot = await users.doc(userCredential.user?.uid).get();
   if (userSnapshot.exists) {
      loginProvider.toggleUid(userCredential.user?.uid);      
         // Optional: Display a success message or navigate to another screen
-     
    loginProvider.toggleUser(0);
    if(userSnapshot['Info']=='0')
     Navigator.pushReplacement( 
@@ -593,6 +600,23 @@ Navigator.pushReplacement(
                       var email = _emailController.text;
                       var password = _passwordController.text;
                       var name = _nameController.text;
+
+                      if(_profileImage==null)
+                      {
+                         ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+      content: Text('Please upload documents too.',style: TextStyle(fontFamily: 'Font'),),
+      backgroundColor: Color(0xFF05696A), // Dark green color
+      behavior: SnackBarBehavior.floating, // Make it floating for rounded corners
+      shape: RoundedRectangleBorder(       // Add rounded corners
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+    ),
+            );
+                          loginProvider.toggleLoginLoader();
+
+    return;
+                      }
 CollectionReference users = FirebaseFirestore.instance.collection('users');
 
   // Query for documents where 'email' field matches the provided email
@@ -623,6 +647,8 @@ CollectionReference users = FirebaseFirestore.instance.collection('users');
       ),
     ),
             );
+                          loginProvider.toggleLoginLoader();
+
     return;
   }
   
@@ -726,6 +752,8 @@ var email; var password; var name;
       ),
     ),
             );
+                                  loginProvider.toggleLoginLoader();
+
 return;
 
                        }
@@ -747,6 +775,8 @@ return;
       ),
     ),
             );
+                                  loginProvider.toggleLoginLoader();
+
   return;
 
                        }
@@ -765,7 +795,8 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
       ),
     ),
             );
-    
+                          loginProvider.toggleLoginLoader();
+
     return;
   }
                       }
@@ -782,11 +813,12 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
       ),
     ),
             );
-    
+                          loginProvider.toggleLoginLoader();
+
     return;
   }
                       }
-  if (_profileImage == null) {
+  if (_profileImage == null || _resumeFile==null) {
      ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
       content: Text('Documents not uploaded',style: TextStyle(fontFamily: 'Font'),),
@@ -797,7 +829,8 @@ if (email.isEmpty || password.isEmpty || name.isEmpty) {
       ),
     ),
             );
-   
+    loginProvider.toggleLoginLoader();
+
     return;
   }
 

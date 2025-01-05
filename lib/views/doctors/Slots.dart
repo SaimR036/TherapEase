@@ -108,21 +108,32 @@ var _priceController = TextEditingController();
   TimeOfDay? _selectedTime;
   var finaltime = '';
   // Helper function to display the date and time
-  String formatSelectedDateTime(BuildContext context) {
+ String formatSelectedDateTime(BuildContext context) {
   if (_selectedDay != null && _selectedTime != null) {
     // Format the date part (e.g., Monday, October 9, 2023)
     String formattedDate = DateFormat('EEEE, MMMM d, y').format(_selectedDay!.toLocal());
 
-    // Format the time part using TimeOfDay's format method
-    String formattedTime = _selectedTime!.format(context);
+    // Manually format the time to 12-hour format (e.g., 6:30 PM)
+    String formattedTime = DateFormat('h:mm a').format(DateTime(
+      _selectedDay!.year, 
+      _selectedDay!.month, 
+      _selectedDay!.day, 
+      _selectedTime!.hour, 
+      _selectedTime!.minute
+    ));
+
+    print('Formatted Time: $formattedTime');
+    
     setState(() {
       finaltime = "$formattedDate; $formattedTime";
     });
+
     // Combine both date and time in a readable format
     return "$formattedDate; $formattedTime";
   }
   return ''; // Return empty string if date or time is not selected
 }
+
  Future<void> addSlotToFirebase(link,price) async {
 
       // Define the slot to add
@@ -145,16 +156,14 @@ var _priceController = TextEditingController();
     // Check if the slot already exists
     bool slotExists = false;
 
-    if (currentSlots != null) {
-      for (var existingSlot in currentSlots) {
-        // Check if the existing slot matches the new slot
-        if (existingSlot['Date'] == slot['Date'] && existingSlot['Time'] == slot['Time']) {
-          slotExists = true;
-          break; // Exit loop if a match is found
-        }
+    for (var existingSlot in currentSlots!) {
+      // Check if the existing slot matches the new slot
+      if (existingSlot['Date'] == slot['Date'] && existingSlot['Time'] == slot['Time']) {
+        slotExists = true;
+        break; // Exit loop if a match is found
       }
     }
-
+  
     if (slotExists) {
        ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -241,7 +250,10 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
           ]),
         ),
         actions: [
-         Row(children: [ TextButton(onPressed: () => Navigator.of(context).pop(), child: FittedBox(child: Text('Cancel',style: TextStyle(color: Color(0xFF05696A))))),
+         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
+          children: [ TextButton(onPressed: () => Navigator.of(context).pop(), child: FittedBox(child: Text('Cancel',style: TextStyle(color: Color(0xFF05696A))))),
           TextButton(onPressed: ()async{
         if (slot==null)
         {
@@ -296,7 +308,7 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
         }
         Navigator.of(context).pop();
           }
-          , child: slot!=null? Text('Delete',style: TextStyle(color: Color(0xFF05696A))):FittedBox(child: Text('Generate Link and add Slot',style: TextStyle(color: Color(0xFF05696A))))),
+          , child: slot!=null? Text('Delete',style: TextStyle(color: Color(0xFF05696A))):FittedBox(child: Text('Add Slot',style: TextStyle(color: Color(0xFF05696A))))),
         ],
       ),
         ])
@@ -335,24 +347,30 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
           parent: animation,
           curve: Curves.easeInOut, // Customize the animation curve
         ),
-        child: Container(
-          height: height*0.3,
-          width: width*0.25,
-          child: Theme(
-          data: ThemeData.light().copyWith(
-            primaryColor: Color(0xFF05696A), // Set the primary color to green
-            colorScheme: ColorScheme.light(primary: Color(0xFF05696A)), // Set color scheme
-            buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.normal), // Make button text primary
-          ), child:TimePickerDialog( // Embedding the TimePickerDialog
-              initialEntryMode: TimePickerEntryMode.inputOnly,
-              initialTime: TimeOfDay.now(),
-            )),
-        ),
+        child:Container(
+  height: height * 0.3,
+  width: width * 0.25,
+  child: MediaQuery(
+    data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+    child: Theme(
+      data: ThemeData.light().copyWith(
+        primaryColor: Color(0xFF05696A), // Set the primary color to green
+        colorScheme: ColorScheme.light(primary: Color(0xFF05696A)), // Set color scheme
+        buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.normal), // Make button text primary
+      ),
+      child: TimePickerDialog(
+        initialEntryMode: TimePickerEntryMode.dial,
+        initialTime: TimeOfDay.now(),
+      ),
+    ),
+  ),
+),
       );
     },
   ).then((pickedTime) {
     if (pickedTime != null && pickedTime is TimeOfDay) {
-      
+      print('TIMEEEEEEEEEEEEEEEEEEEEEEEE');
+      print(pickedTime);
       setState(() {
         _selectedTime = pickedTime;
         // Update the display string with both date and time
@@ -449,7 +467,7 @@ Future<void> _showCustomDialog(BuildContext context,slot) async {
                         defaultBuilder: (context, day, focusedDay) {
         
                           return Container(
-                            padding: EdgeInsets.all(5),
+                            padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: (isSameDay(focusedDay, day) ? Color(0xFF17A2A3) : Colors.green),
                               shape: BoxShape.circle,

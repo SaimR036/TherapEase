@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +6,6 @@ import 'package:flutter_application_1/providers/enlarger_provider.dart';
 import 'package:flutter_application_1/providers/parent_info_container.dart';
 import 'package:fuzzy/fuzzy.dart';
 import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 class ParentInfo extends StatefulWidget {
   var isUser = false;
@@ -165,60 +163,60 @@ Stack(
                Container(
                
                 margin: EdgeInsets.fromLTRB(0,height*0.13,0,0),
-                child:  IndProvider.allDoctors.length!=0?
-                ListView.builder(
-                      itemCount: provider.search_one==true? IndProvider.search_list.length: /*type=='All'?*/  IndProvider.allDoctors.length/*: IndProvider.allDoctors.where((doctor) => doctor['Profession'].toLowerCase() == type.toLowerCase()).toList().length*/,
-                      itemBuilder: (context, index) {
-                        print(IndProvider.allDoctors);
-                        var isSelected=false;
-                        var doctor = provider.search_one==true? IndProvider.search_list[index]["data"] :/*type=='All'?*/  IndProvider.allDoctors[index]["data"] ;/*: IndProvider.allDoctors.where((doctor) => doctor['Profession'].toLowerCase() == type.toLowerCase()).toList()[index];*/
-                        var id = provider.search_one==true? IndProvider.search_list[index]["id"] :/*type=='All'?*/  IndProvider.allDoctors[index]["id"] ;/*: IndProvider.allDoctors.where((doctor) => doctor['Profession'].toLowerCase() == type.toLowerCase()).toList()[index];*/
+                child: // IndProvider.allDoctors.length!=0?
+            //     ListView.builder(
+            //           itemCount: provider.search_one==true? IndProvider.search_list.length: /*type=='All'?*/  IndProvider.allDoctors.length/*: IndProvider.allDoctors.where((doctor) => doctor['Profession'].toLowerCase() == type.toLowerCase()).toList().length*/,
+            //           itemBuilder: (context, index) {
+            //             print(IndProvider.allDoctors);
+            //             var isSelected=false;
+            //             var doctor = provider.search_one==true? IndProvider.search_list[index]["data"] :/*type=='All'?*/  IndProvider.allDoctors[index]["data"] ;/*: IndProvider.allDoctors.where((doctor) => doctor['Profession'].toLowerCase() == type.toLowerCase()).toList()[index];*/
+            //             var id = provider.search_one==true? IndProvider.search_list[index]["id"] :/*type=='All'?*/  IndProvider.allDoctors[index]["id"] ;/*: IndProvider.allDoctors.where((doctor) => doctor['Profession'].toLowerCase() == type.toLowerCase()).toList()[index];*/
 
 
-                        return 
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children:[TextContainer(id:id,isSelected:false,isUser: widget.isUser,height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: provider.show,index:index, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width)
-                    ,AnimatedContainer(
-                      alignment: Alignment.topLeft,
-                      margin: EdgeInsets.fromLTRB(width*0.075,0,0,0),
-                    color: Color(0xFF267979),
-                    width: width*0.25,
-                    duration: Duration(milliseconds: 200),
-                  child:TextButton.icon(onPressed: (){
-                         if(IndProvider.ind==index)
-                      {
-                        provider.toggleAlotDate("");
-                        IndProvider.toggleInd(-1);
-                         provider.toggeCalendarShow(-1);
-                        //_enlarged=false;
-                       Future.delayed(Duration(milliseconds: 700),(){
-              provider.toggleShow(false);
-            });
-                      }
-                      else{
-                        provider.toggleAlotDate("");
-                        print(index);
-                                                IndProvider.toggleInd(index);
-                        provider.toggeCalendarShow(-1);
-                        //_enlarged=true;
-                      Future.delayed(Duration(milliseconds: 200),(){
-                      provider.toggleShow(true);
+            //             return 
+            //               Column(
+            //                 crossAxisAlignment: CrossAxisAlignment.start,
+            //         mainAxisAlignment: MainAxisAlignment.start,
+            //         children:[TextContainer(id:id,isSelected:false,isUser: widget.isUser,height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: provider.show,index:index, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width)
+            //         ,AnimatedContainer(
+            //           alignment: Alignment.topLeft,
+            //           margin: EdgeInsets.fromLTRB(width*0.075,0,0,0),
+            //         color: Color(0xFF267979),
+            //         width: width*0.25,
+            //         duration: Duration(milliseconds: 200),
+            //       child:TextButton.icon(onPressed: (){
+            //              if(IndProvider.ind==index)
+            //           {
+            //             provider.toggleAlotDate("");
+            //             IndProvider.toggleInd(-1);
+            //              provider.toggeCalendarShow(-1);
+            //             //_enlarged=false;
+            //            Future.delayed(Duration(milliseconds: 700),(){
+            //   provider.toggleShow(false);
+            // });
+            //           }
+            //           else{
+            //             provider.toggleAlotDate("");
+            //             print(index);
+            //                                     IndProvider.toggleInd(index);
+            //             provider.toggeCalendarShow(-1);
+            //             //_enlarged=true;
+            //           Future.delayed(Duration(milliseconds: 200),(){
+            //           provider.toggleShow(true);
             
-                      });
-                      }
+            //           });
+            //           }
 
-                  }, label: FittedBox(child: Text('Reviews',style: TextStyle(color: Colors.white),)),icon:  Icon(IndProvider.ind==index?Icons.arrow_drop_up: Icons.arrow_drop_down,color: Colors.black,),)
+            //       }, label: FittedBox(child: Text('Reviews',style: TextStyle(color: Colors.white),)),icon:  Icon(IndProvider.ind==index?Icons.arrow_drop_up: Icons.arrow_drop_down,color: Colors.black,),)
                   
-                  )
-                    ]
-                     );
+            //       )
+            //         ]
+            //          );
                      
         
                      
-                      },
-                    ):
+            //           },
+            //         ):
                 
                 
                 
@@ -238,62 +236,65 @@ Stack(
                      // IndProvider.toggleAllDoctors(allDoctors);
 
                     
-                    return ListView.builder(
-                      itemCount: snapshot.data!.docs.length,
-                      itemBuilder: (context, index) {
-                        Future.delayed(Duration.zero,(){
-                        IndProvider.toggleAllDoctors( snapshot.data!.docs.map((doc) {
-      return {
-        "id": doc.reference.id,
-        "data": doc.data(), // Document data
-      };
-    }).toList());});
-
-                        var doctor = snapshot.data!.docs[index];
-                        var id = snapshot.data!.docs[index].reference.id;
-                      //  doctor = doctor.data();
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                    children:[TextContainer(id:id, isSelected:false,isUser: widget.isUser,height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: provider.show,index:index, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width)
-                    ,AnimatedContainer(
-                      alignment: Alignment.topLeft,
-                      margin: EdgeInsets.fromLTRB(width*0.075,0,0,0),
-                    color: Color(0xFF267979),
-                    width: width*0.25,
-                    duration: Duration(milliseconds: 200),
-                  child:TextButton.icon(onPressed: (){
-
-                    setState(() {
+                    return Padding(
+                      padding:  EdgeInsets.only(top: height*0.1),
+                      child: ListView.builder(
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          Future.delayed(Duration.zero,(){
+                          IndProvider.toggleAllDoctors( snapshot.data!.docs.map((doc) {
+                            return {
+                              "id": doc.reference.id,
+                              "data": doc.data(), // Document data
+                            };
+                          }).toList());});
                       
-                    });
-                         if(IndProvider.ind==index)
-                      {
-                        provider.toggleAlotDate("");
-                        IndProvider.toggleInd(-1);
-                         provider.toggeCalendarShow(-1);
-                        //_enlarged=false;
-                       Future.delayed(Duration(milliseconds: 700),(){
-              provider.toggleShow(false);
-            });
-                      }
-                      else{
-                        provider.toggleAlotDate("");
-                        print(index);
-                                                IndProvider.toggleInd(index);
-                        provider.toggeCalendarShow(-1);
-                        //_enlarged=true;
-                      Future.delayed(Duration(milliseconds: 200),(){
-                      provider.toggleShow(true);
-            
+                          var doctor = snapshot.data!.docs[index];
+                          var id = snapshot.data!.docs[index].reference.id;
+                        //  doctor = doctor.data();
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                      children:[TextContainer(id:id, isSelected:false,isUser: widget.isUser,height: height, width: width, normalHeight: normal_height, normalWidth: normal_width,   doctor: doctor,show: provider.show,index:index, enlargedHeight: enlarged_height, enlargedWidth: enlarged_width)
+                      ,AnimatedContainer(
+                        alignment: Alignment.topLeft,
+                        margin: EdgeInsets.fromLTRB(width*0.075,0,0,0),
+                      color: Color(0xFF267979),
+                      width: width*0.25,
+                      duration: Duration(milliseconds: 200),
+                                        child:TextButton.icon(onPressed: (){
+                      
+                      setState(() {
+                        
                       });
-                      }
-
-                  }, label: FittedBox(child: Text('Reviews',style: TextStyle(color: Colors.white),)),icon:  Icon(IndProvider.ind==index?Icons.arrow_drop_up: Icons.arrow_drop_down,color: Colors.black,),)
-                  
-                  )
-                    ]
-                     ); },
+                           if(IndProvider.ind==index)
+                        {
+                          provider.toggleAlotDate("");
+                          IndProvider.toggleInd(-1);
+                           provider.toggeCalendarShow(-1);
+                          //_enlarged=false;
+                         Future.delayed(Duration(milliseconds: 700),(){
+                                    provider.toggleShow(false);
+                                  });
+                        }
+                        else{
+                          provider.toggleAlotDate("");
+                          print(index);
+                                                  IndProvider.toggleInd(index);
+                          provider.toggeCalendarShow(-1);
+                          //_enlarged=true;
+                        Future.delayed(Duration(milliseconds: 200),(){
+                        provider.toggleShow(true);
+                                  
+                        });
+                        }
+                      
+                                        }, label: FittedBox(child: Text('Reviews',style: TextStyle(color: Colors.white),)),icon:  Icon(IndProvider.ind==index?Icons.arrow_drop_up: Icons.arrow_drop_down,color: Colors.black,),)
+                                        
+                                        )
+                      ]
+                       ); },
+                      ),
                     );
                   },
                 )

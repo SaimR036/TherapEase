@@ -1,8 +1,6 @@
-import 'dart:ui';
 import 'package:flutter_application_1/views/users/Login.dart';
 import 'package:page_transition/page_transition.dart'; 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class LangSelect extends StatefulWidget {
   const LangSelect({super.key});
@@ -35,12 +33,14 @@ Color(0xFF29BDBD), // Second hex color (Red)
           // FadeTransition for both Text widgets
           Container(
             margin: EdgeInsets.fromLTRB(0.20 * width, 0.35 * height, 0, 0),
-            child: Text(
-              'Please select a language',
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: 'Font',
-                fontSize: 20,
+            child: FittedBox(
+              child: Text(
+                'Please select a language',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Font',
+                  fontSize: 20,
+                ),
               ),
             ),
           ),

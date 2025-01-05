@@ -24,6 +24,21 @@ var time;
   var show_adder = false;
   var enlarged_adder = false;
   var alotDate = "";
+
+var small_slots;
+  void toggleSmallSlots(slots)
+  {
+    small_slots = slots;
+    notifyListeners();
+  }
+
+var big_slots;
+  void toggleBigSlots(slots)
+  {
+    big_slots = slots;
+    notifyListeners();
+  }
+
   void toggleRev_Loading()
   {
     rev_loading = !rev_loading;
